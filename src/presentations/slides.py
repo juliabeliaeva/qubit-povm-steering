@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, Set, Iterable, List, Tuple
+from typing import Dict, Set, Iterable, List, Tuple, Optional
 
 import plotly.graph_objects as go
 from plotly.basedatatypes import BaseTraceType
@@ -15,7 +15,7 @@ class SlideBuilder:
 
     @property
     def n_steps(self):
-        return max(self.visible_traces.keys()) + 1
+        return max([*self.visible_traces.keys(), *self.visible_lines.keys()]) + 1
 
     def add_line(self, line: str) -> int:
         self.lines.append(line)
@@ -58,7 +58,7 @@ class SlideBuilder:
         for trace_idx in trace_indices:
             self.visible_traces[self.current_step].add(trace_idx)
 
-    def build(self, step: int) -> Tuple[go.Figure, str]:
+    def build(self, step: int) -> Tuple[Optional[go.Figure], str]:
         visible_traces = self.visible_traces[step]
         for i, trace in enumerate(self.fig.data):
             trace.visible = i in visible_traces
@@ -66,4 +66,13 @@ class SlideBuilder:
         visible_lines = self.visible_lines[step]
         text = "\n\n".join([line for i, line in enumerate(self.lines) if i in visible_lines])
 
+        if not self.fig.data:
+            return None, text
+
         return self.fig, text
+
+
+def create_text_slide(text: str) -> SlideBuilder:
+    slide_builder = SlideBuilder()
+    slide_builder.add_line(text)
+    return slide_builder
