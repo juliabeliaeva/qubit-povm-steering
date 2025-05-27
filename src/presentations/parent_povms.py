@@ -2,9 +2,9 @@ import math
 from typing import List, Tuple, Set, Dict
 
 import numpy as np
-import plotly.colors as pc
 import plotly.graph_objects as go
 
+from plotly_utils import get_color_with_alpha, get_color
 from povms import QubitPovm, plot_povm
 from presentations.slides import SlideBuilder
 from quantum_utils import normalize
@@ -18,19 +18,6 @@ def read_md(path: str) -> List[str]:
 
 pvm_text = read_md("data/pvm.md")
 povm3_text = read_md("data/povm3.md")
-
-
-def get_color_with_alpha(color: str, alpha: float) -> str:
-    if color.startswith('#'):
-        hex_color = color.lstrip('#')
-        r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
-    else:
-        r, g, b = map(int, color.strip('rgb()').split(','))
-    return f'rgba({r}, {g}, {b}, {alpha})'
-
-
-def get_color(color_sequence_name: str, idx: int) -> str:
-    return getattr(pc.qualitative, color_sequence_name)[idx]
 
 
 def get_angle(u: np.ndarray, v: np.ndarray, normal: np.ndarray) -> float:
@@ -276,7 +263,8 @@ def get_hemisphere_indices(angle: float, vector_angles: List[float]) -> Set[int]
     return set([i for i, inner in enumerate(inner_products) if inner >= 0])
 
 
-def plot_povm_vectors(slide_builder: SlideBuilder, vectors: List[Tuple[float, str, str]], radius: float) -> List[
+def plot_povm_vectors(slide_builder: SlideBuilder, vectors: List[Tuple[float, str, str]],
+                      radius: float) -> List[
     int]:
     traces = []
     for vector_angle, vector_name, vector_color in vectors:
