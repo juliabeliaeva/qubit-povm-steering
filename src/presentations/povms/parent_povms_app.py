@@ -8,8 +8,9 @@ from dash.development.base_component import Component
 from dash_extensions import Keyboard
 
 from povms import get_povm, get_pvm
-from presentations.parent_povms import plot_flat_povm, plot_pvm
-from presentations.slides import SlideBuilder, create_text_slide
+from presentations.povms.povm3 import plot_flat_povm
+from presentations.povms.pvm import plot_pvm
+from presentations.povms.slides import SlideBuilder, create_text_slide
 
 title = "Parent POVM Constructions"
 
