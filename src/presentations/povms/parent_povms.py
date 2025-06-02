@@ -1,20 +1,32 @@
 import math
+import re
 from typing import List, Tuple, Set, Dict
 
 import numpy as np
 import plotly.graph_objects as go
 
+from latex_util import latex_to_html
 from plotly_utils import get_color_with_alpha
 from povms import QubitPovm, plot_povm
 from presentations.povms.slides import SlideBuilder
 from quantum_utils import normalize
 
 
-def read_md(path: str) -> List[str]:
+def read_md(path: str) -> Dict[str, str]:
     with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    return content.split('<!---->')
+    pattern = r'<!--([a-zA-Z0-9]*)-->'
+    matches = list(re.finditer(pattern, content))
+    result: Dict[str, str] = {}
+    for i, match in enumerate(matches):
+        label = match.group(1)
+        text_start = match.end()
+        text_end = matches[i + 1].start() if i + 1 < len(matches) else len(content)
+        if not label:
+            label = str(i)
+        result[label] = content[text_start:text_end].strip()
+    return result
 
 
 def get_angle(u: np.ndarray, v: np.ndarray, normal: np.ndarray) -> float:
@@ -37,10 +49,18 @@ def get_angles(povm: QubitPovm) -> List[float]:
             get_angle(povm.vectors[0], povm.vectors[2], normal)]
 
 
-def get_labels(povm: QubitPovm) -> List[str]:
-    if povm.n_outcomes == 2:
-        return ["x", "-x"]
-    return [f"x<sub>{i + 1}</sub>" for i in range(povm.n_outcomes)]
+def get_labels(povm: QubitPovm, noise: int = 1) -> List[str]:
+    return get_labels_for_outcomes(povm.n_outcomes, noise)
+
+
+def get_labels_for_outcomes(n_outcomes: int, noise: int):
+    if n_outcomes == 2:
+        result = ["x", "-x"]
+    else:
+        result = ["x_{" + str(i + 1) + "}" for i in range(n_outcomes)]
+    if noise == 1:
+        return [latex_to_html(r) for r in result]
+    return [latex_to_html(r"\frac{" + r + "}{" + str(noise) + "}") for r in result]
 
 
 def get_response_table_pvm(povm: QubitPovm) -> Dict[Tuple[int, Tuple], float]:
@@ -83,17 +103,24 @@ def get_hemisphere_indices(angle: float, vector_angles: List[float]) -> Set[int]
 
 
 def plot_povm_vectors(slide_builder: SlideBuilder, vectors: List[Tuple[float, str, str]],
-                      radius: float) -> List[int]:
-    traces = []
+                      radius: float) -> Tuple[List[int], List[int]]:
+    vector_traces = []
+    label_traces = []
     for vector_angle, vector_name, vector_color in vectors:
         x = radius * math.cos(vector_angle)
         y = radius * math.sin(vector_angle)
-        traces.append(slide_builder.add_trace(go.Scatter(x=[0, x / 2, x], y=[0, y / 2, y],
-                                                         mode='lines+text', line=dict(color=vector_color, width=8),
-                                                         text=['', " " + vector_name, ''], textposition='bottom center',
-                                                         textfont=dict(size=32), zorder=10,
-                                                         name=vector_name)))
-    return traces
+        vector_traces.append(slide_builder.add_trace(go.Scatter(x=[0, x], y=[0, y],
+                                                                mode='lines', zorder=10,
+                                                                line=dict(color=vector_color, width=8),
+                                                                name=vector_name)))
+        label_traces.append(slide_builder.add_trace(go.Scatter(x=[0.5 * x], y=[0.5 * y],
+                                                               mode='text',
+                                                               text=["   " + vector_name],
+                                                               textposition='bottom center',
+                                                               textfont=dict(size=26), zorder=10)))
+    vector_traces.append(slide_builder.add_trace(go.Scatter(x=[0], y=[0], mode='markers',
+                                                            marker=dict(color='black', size=8), zorder=11)))
+    return vector_traces, label_traces
 
 
 def plot_hemispheres(slide_builder: SlideBuilder, vectors: List[Tuple[float, str, str]], radius: float):
