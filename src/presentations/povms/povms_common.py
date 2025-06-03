@@ -55,9 +55,9 @@ def get_labels(povm: QubitPovm, noise: int = 1) -> List[str]:
 
 def get_labels_for_outcomes(n_outcomes: int, noise: int):
     if n_outcomes == 2:
-        result = ["x&#770;", "-x&#770;"]
+        result = ["x̂", "-x̂"]
     else:
-        result = ["x&#770;_{" + str(i + 1) + "}" for i in range(n_outcomes)]
+        result = ["x̂_{" + str(i + 1) + "}" for i in range(n_outcomes)]
     if noise == 1:
         return [latex_to_html(r) for r in result]
     return [latex_to_html(r"\frac{" + r + "}{" + str(noise) + "}") for r in result]
