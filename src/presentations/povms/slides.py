@@ -2,16 +2,19 @@ from collections import defaultdict
 from typing import Dict, Set, Iterable, List, Tuple, Optional
 
 import plotly.graph_objects as go
+from dash import dcc, html
+from dash.development.base_component import Component
 from plotly.basedatatypes import BaseTraceType
 
 
 class SlideBuilder:
-    def __init__(self):
+    def __init__(self, center: bool = False):
         self.current_step: int = 0
         self.visible_traces: Dict[int, Set[int]] = defaultdict(set)
         self.visible_lines: Dict[int, Set[int]] = defaultdict(set)
         self.fig = go.Figure()
         self.lines: List[str] = []
+        self.center = center
 
     @property
     def n_steps(self):
@@ -44,6 +47,13 @@ class SlideBuilder:
         self.visible_traces[self.current_step] = visible_traces
         self.visible_lines[self.current_step] = visible_lines
 
+    def hide_line(self, line_idx: int):
+        self.visible_lines[self.current_step].remove(line_idx)
+
+    def hide_lines(self, line_indices: List[int]):
+        for line_idx in line_indices:
+            self.visible_lines[self.current_step].remove(line_idx)
+
     def hide_all_lines(self):
         self.visible_lines[self.current_step].clear()
 
@@ -71,8 +81,33 @@ class SlideBuilder:
 
         return self.fig, text
 
+    def build_components(self, step: int) -> Tuple[List[Component], dict]:
+        figure, text = self.build(step)
+
+        result = []
+        if figure:
+            result.append(dcc.Graph(figure=figure, config={"scrollZoom": True}, style={
+                "flex": "1", "height": "100vh"
+            }))
+        result.append(
+            html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True)), style={
+                "flex": "1", "padding": "1px", "fontSize": "28px",
+                "overflow": "auto"
+            }))
+        if self.center:
+            style = {"alignItems": "center"}
+        else:
+            style = {"alignItems": "flex-start"}
+        return result, style
+
 
 def create_text_slide(text: str) -> SlideBuilder:
-    slide_builder = SlideBuilder()
+    slide_builder = SlideBuilder(center=True)
     slide_builder.add_line(text)
+    return slide_builder
+
+
+def create_title_slide(title: str, level: int = 1) -> SlideBuilder:
+    slide_builder = SlideBuilder(center=True)
+    slide_builder.add_line(f"<p style=\"text-align:center;\"><h{level}>{title}</h{level}></p>")
     return slide_builder

@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 
 from latex_util import latex_to_html
 from plotly_utils import get_color_with_alpha
-from povms import QubitPovm, plot_povm
+from povms import QubitPovm
 from presentations.povms.slides import SlideBuilder
 from quantum_utils import normalize
 
@@ -55,9 +55,9 @@ def get_labels(povm: QubitPovm, noise: int = 1) -> List[str]:
 
 def get_labels_for_outcomes(n_outcomes: int, noise: int):
     if n_outcomes == 2:
-        result = ["x", "-x"]
+        result = ["x&#770;", "-x&#770;"]
     else:
-        result = ["x_{" + str(i + 1) + "}" for i in range(n_outcomes)]
+        result = ["x&#770;_{" + str(i + 1) + "}" for i in range(n_outcomes)]
     if noise == 1:
         return [latex_to_html(r) for r in result]
     return [latex_to_html(r"\frac{" + r + "}{" + str(noise) + "}") for r in result]
@@ -131,7 +131,7 @@ def plot_hemispheres(slide_builder: SlideBuilder, vectors: List[Tuple[float, str
         hemisphere_x = np.concatenate([arc_x, [0], [arc_x[0]]])
         hemisphere_y = np.concatenate([arc_y, [0], [arc_y[0]]])
 
-        transparent_color = get_color_with_alpha(vector_color, 0.3)
+        transparent_color = get_color_with_alpha(vector_color, 0.35)
         slide_builder.add_trace(go.Scatter(x=hemisphere_x, y=hemisphere_y,
                                            fill='toself', fillcolor=transparent_color, line=dict(color='black'),
                                            hoverinfo='skip'))
@@ -144,11 +144,3 @@ def update_layout(fig: go.Figure):
                       font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif"),
                       margin=dict(l=0, r=0, t=0, b=0),
                       plot_bgcolor='white', title=None, showlegend=False)
-
-
-def plot_3d_povm(povm: QubitPovm) -> go.Figure:
-    fig = plot_povm(povm)
-    fig.update_layout(margin=dict(l=0, r=0, t=0, b=0),
-                      scene=dict(dragmode="orbit"),
-                      uirevision="constant")
-    return fig

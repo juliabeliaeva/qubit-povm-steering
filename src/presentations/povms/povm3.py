@@ -4,11 +4,14 @@ from typing import Dict, Tuple
 import numpy as np
 from plotly import graph_objects as go
 
+from latex_util import latex_to_html
 from plotly_utils import get_color
 from povms import QubitPovm
 from presentations.povms.povms_common import get_angles, get_labels, plot_povm_vectors, plot_hemispheres, \
     get_response_table_pvm, plot_response_function, get_hemisphere_indices, update_layout, read_md
 from presentations.povms.slides import SlideBuilder
+
+povm3_text = read_md("data/povm3.md")
 
 
 def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
@@ -21,7 +24,10 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     angles = get_angles(povm)
     labels = get_labels(povm)
-    colors = [get_color("D3", i) for i in range(len(povm.vectors))]
+    # colors = [get_color("D3", i) for i in range(len(povm.vectors))]
+    colors = [get_color("D3", 0),
+              get_color("D3", 3),
+              get_color("D3", 2)]
     vectors = list(zip(angles, labels, colors))
 
     vector_traces, label_traces = plot_povm_vectors(slide_builder, vectors, radius)
@@ -62,7 +68,6 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder.next_step()
     slide_builder.hide_all_lines()
     slide_builder.hide_traces(traces_before)
-    # slide_builder.hide_traces(vector_traces)
 
     sector_angles = get_sector_angles(angles)
     sector_traces = []
@@ -77,9 +82,7 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     slide_builder.next_step()
     slide_builder.add_line(povm3_text['coarse'])
-    # slide_builder.hide_traces(sector_traces)
     slide_builder.hide_traces(parent_traces)
-    # slide_builder.show_traces(vector_traces)
 
     for sector_angle in sector_angles:
         x = radius * math.cos(sector_angle)
@@ -91,38 +94,116 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     slide_builder.next_step()
     slide_builder.add_line(povm3_text['coarseexplicit'])
+    coarse_labels = []
+    for sector_angle in sector_angles:
+        x = radius * math.cos(sector_angle)
+        y = radius * math.sin(sector_angle)
+        hemisphere_indices = get_hemisphere_indices(sector_angle, angles)
+        if len(hemisphere_indices) == 2:
+            lambda_idx = next(iter(set(range(povm.n_outcomes)) - hemisphere_indices))
+        else:
+            lambda_idx = next(iter(hemisphere_indices))
+        sign = "-" if len(hemisphere_indices) == 1 else ""
+        lambda_label = latex_to_html(rf"${sign}\lambda&#770;_" + str(lambda_idx + 1) + "$")
+        trace_lambda = slide_builder.add_trace(go.Scatter(x=[1.1 * 2 * x], y=[1.1 * 2 * y],
+                                                          mode='text', textfont=dict(size=32),
+                                                          textposition='middle center', text=[lambda_label]))
+        if len(hemisphere_indices) == 1:
+            theta_label = latex_to_html(r"\theta_{" + str(lambda_idx + 1) + "}$")
+            trace_theta = slide_builder.add_trace(go.Scatter(x=[0.4 * x], y=[0.4 * y],
+                                                             mode='text', textfont=dict(size=32), zorder=20,
+                                                             textposition='middle center', text=[theta_label]))
+            coarse_labels.append(trace_theta)
+
+        coarse_labels.append(trace_lambda)
+
     slide_builder.next_step()
+    slide_builder.hide_traces(coarse_labels)
+    slide_builder.hide_all_lines()
     slide_builder.add_line(povm3_text['responceunnorm'])
 
     traces_before2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
                                             response_table_before, radius)
     slide_builder.next_step()
-    slide_builder.hide_all_lines()
-    slide_builder.add_line(povm3_text['responceunnorm'])
     slide_builder.add_line(povm3_text['responcenorm'])
 
     slide_builder.next_step()
     slide_builder.hide_traces(traces_before2)
-    traces_after2 = []
-    for alpha in np.linspace(0.0, 1.0, 10):
-        slide_builder.hide_traces(traces_after2)
-        response_table_after = get_response_table(povm, alpha=alpha)
-        traces_after2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
-                                               response_table_after, radius)
-        slide_builder.next_step()
+    response_table_after = get_response_table(povm)
+    traces_after2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
+                                           response_table_after, radius)
+
+    slide_builder.next_step()
+    slide_builder.add_line(povm3_text['simulates'])
 
     update_layout(slide_builder.fig)
 
     return slide_builder
 
 
-povm3_text = read_md("data/povm3.md")
+def plot_flat_povm_proof() -> SlideBuilder:
+    slide_builder = SlideBuilder(center=False)
+    slide_builder.add_line(povm3_text['coarsesimple'])
+    slide_builder.next_step()
+
+    slide_builder.add_line(povm3_text['coarsesimplesim'])
+    slide_builder.next_step()
+
+    sub1 = slide_builder.add_line(povm3_text['coarsesimplesimsub1'])
+    slide_builder.next_step()
+
+    slide_builder.hide_line(sub1)
+    sub2 = slide_builder.add_line(povm3_text['coarsesimplesimsub2'])
+    slide_builder.next_step()
+
+    # slide_builder.hide_line(sub2)
+    sub3 = slide_builder.add_line(povm3_text['coarsesimplesimsub3'])
+    slide_builder.next_step()
+
+    slide_builder.hide_all_lines()
+    slide_builder.add_line(povm3_text['coarsesimple2'])
+    slide_builder.add_line(povm3_text['coarseneed1'])
+    slide_builder.next_step()
+
+    slide_builder.hide_all_lines()
+    slide_builder.add_line(povm3_text['coarsesimple2'])
+    slide_builder.add_line(povm3_text['coarseneed2'])
+    slide_builder.next_step()
+
+    sigma1 = slide_builder.add_line(povm3_text['coarseneedsigma1'])
+    slide_builder.next_step()
+
+    sigma2 = slide_builder.add_line(povm3_text['coarseneedsigma2'])
+    slide_builder.next_step()
+
+    sigma3 = slide_builder.add_line(povm3_text['coarseneedsigma3'])
+    slide_builder.next_step()
+
+    sigma4 = slide_builder.add_line(povm3_text['coarseneedsigma4'])
+    slide_builder.next_step()
+
+    slide_builder.hide_lines([sigma1, sigma2, sigma3, sigma4])
+    i1 = slide_builder.add_line(povm3_text['coarseneedi1'])
+    slide_builder.next_step()
+
+    i2 = slide_builder.add_line(povm3_text['coarseneedi2'])
+    slide_builder.next_step()
+
+    i3 = slide_builder.add_line(povm3_text['coarseneedi3'])
+    slide_builder.next_step()
+
+    return slide_builder
 
 
-def get_response_table(povm: QubitPovm, alpha: float) -> Dict[Tuple[int, Tuple], float]:
+def get_response_table(povm: QubitPovm) -> Dict[Tuple[int, Tuple], float]:
     result = get_response_table_pvm(povm)
 
-    x = 0.05 * alpha + (1 - 2 * povm.mus[0] - 0.05) * (1 - alpha)
+    thetas = np.array([(math.acos(-np.inner(povm.vectors[1], povm.vectors[2]))),
+                       math.acos(-np.inner(povm.vectors[0], povm.vectors[2])),
+                       math.acos(-np.inner(povm.vectors[0], povm.vectors[1]))])
+
+    x = ((thetas[0] * (1 - 2 * povm.mus[0]) - thetas[1] * (1 - 2 * povm.mus[1]) + thetas[2] * (1 - 2 * povm.mus[2])) /
+         (2 * thetas[0]))
     y = 1 - 2 * povm.mus[0] - x
     result[(1, (0,))] = y
     result[(2, (0,))] = x

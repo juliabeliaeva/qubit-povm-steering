@@ -6,6 +6,7 @@ from typing import List, Tuple
 import numpy as np
 import plotly.colors as pc
 import plotly.graph_objects as go
+from plotly.basedatatypes import BaseTraceType
 from scipy.spatial.transform import Rotation
 
 from crossections import make_orthogonal
@@ -50,10 +51,10 @@ def get_random_povm() -> QubitPovm:
     mu1, mu2, mu3 = get_random_triangle()
     x, y = get_random_plane()
 
-    return get_povm(mu1, mu2, mu3, x, y)
+    return get_povm3(mu1, mu2, mu3, x, y)
 
 
-def get_povm(mu1: float, mu2: float, mu3: float, plane_x: np.ndarray, plane_y: np.ndarray) -> QubitPovm:
+def get_povm3(mu1: float, mu2: float, mu3: float, plane_x: np.ndarray, plane_y: np.ndarray) -> QubitPovm:
     alpha3 = get_angle_from_sides(mu1, mu2, mu3)
     x1 = plane_x
     x2 = -math.cos(alpha3) * plane_x - math.sin(alpha3) * plane_y
@@ -74,18 +75,30 @@ def get_uniform_povm3() -> QubitPovm:
     return QubitPovm([x1, x2, x3], mus, 1)
 
 
+def get_uniform_povm4() -> QubitPovm:
+    mus = [1 / 4, 1 / 4, 1 / 4, 1 / 4]
+    x1 = np.array([1, 1, 1]) / math.sqrt(3)
+    x2 = np.array([1, -1, -1]) / math.sqrt(3)
+    x3 = np.array([-1, 1, -1]) / math.sqrt(3)
+    x4 = np.array([-1, -1, 1]) / math.sqrt(3)
+    return QubitPovm([x1, x2, x3, x4], mus, 1)
+
+
 def add_noise(povm: QubitPovm, r: float) -> QubitPovm:
     return QubitPovm(povm.vectors, povm.mus, povm.r * r)
 
 
-def plot_povm(povm: QubitPovm) -> go.Figure:
+def plot_sphere(radius: float = 1) -> BaseTraceType:
     u, v = np.mgrid[0:2 * np.pi:60j, 0:np.pi:30j]
-    xs = np.cos(u) * np.sin(v)
-    ys = np.sin(u) * np.sin(v)
-    zs = np.cos(v)
+    xs = radius * np.cos(u) * np.sin(v)
+    ys = radius * np.sin(u) * np.sin(v)
+    zs = radius * np.cos(v)
+    return go.Surface(x=xs, y=ys, z=zs, opacity=0.03, showscale=False)
 
+
+def plot_povm(povm: QubitPovm) -> go.Figure:
     fig = go.Figure()
-    fig.add_trace(go.Surface(x=xs, y=ys, z=zs, opacity=0.03, showscale=False))
+    fig.add_trace(plot_sphere())
 
     color_sequence_name = "D3"
     for i, (vec, mu) in enumerate(zip(povm.vectors, povm.mus)):

@@ -1,16 +1,16 @@
-from typing import Tuple, List, Optional
+from typing import Tuple, List
 
 import dash
 import numpy as np
-import plotly.graph_objects as go
 from dash import dcc, html, Input, Output
 from dash.development.base_component import Component
 from dash_extensions import Keyboard
 
-from povms import get_povm, get_pvm
-from presentations.povms.povm3 import plot_flat_povm
+from povms import get_povm3, get_pvm, get_uniform_povm4
+from presentations.povms.povm3 import plot_flat_povm, plot_flat_povm_proof
+from presentations.povms.povm4 import plot_povm4
 from presentations.povms.pvm import plot_pvm
-from presentations.povms.slides import SlideBuilder, create_text_slide
+from presentations.povms.slides import SlideBuilder, create_title_slide
 
 title = "Parent POVM Constructions"
 
@@ -18,28 +18,34 @@ app = dash.Dash(__name__)
 app.title = title
 
 pvm = get_pvm()
-povm3 = get_povm(0.25, 0.32, 0.43,
-                 np.array([1, 0, 0]), np.array([0, 1, 0]))
+povm3 = get_povm3(0.25, 0.32, 0.43,
+                  np.array([1, 0, 0]), np.array([0, 1, 0]))
+povm4 = get_uniform_povm4()
 
-slides: List[SlideBuilder] = [create_text_slide(f"<p style=\"text-align:center;\"><h1>{title}</h1></p>"),
+slides: List[SlideBuilder] = [create_title_slide(title),
+                              create_title_slide("Parent POVM for projectors", level=2),
                               plot_pvm(pvm),
-                              plot_flat_povm(povm3)]
+                              create_title_slide("Parent POVM for 3-outcome measurements", level=2),
+                              plot_flat_povm(povm3),
+                              plot_flat_povm_proof(),
+                              create_title_slide("Parent POVM for 4-outcome measurements", level=2),
+                              plot_povm4(povm4)]
 
 
-def build_slide(step_idx: int) -> Tuple[Optional[go.Figure], str]:
+def build_slide(step_idx: int) -> Tuple[List[Component], dict]:
     current_step_idx = step_idx
     for current_slide in slides:
         if current_slide.n_steps > current_step_idx:
-            return current_slide.build(current_step_idx)
+            return current_slide.build_components(current_step_idx)
         current_step_idx -= current_slide.n_steps
-    return slides[-1].build(slides[-1].n_steps - 1)
+    return slides[-1].build_components(slides[-1].n_steps - 1)
 
 
 base_style = {"display": "flex", "flexDirection": "row",
               "height": "100vh", "width": "100%"}
 app.layout = html.Div([
     dcc.Store(id="slide-index", data=0),
-    Keyboard(id="keyboard", captureKeys=["ArrowRight", "ArrowLeft"]),
+    Keyboard(id="keyboard", captureKeys=["ArrowRight", "ArrowLeft", " "]),
     html.Div(id='slide-content', children=[], style=base_style),
 ])
 
@@ -53,7 +59,7 @@ app.layout = html.Div([
 def on_key(e: dict, n_keydowns: int, current_slide: int) -> int:
     if not e or "key" not in e:
         return current_slide
-    if e["key"] == "ArrowRight":
+    if e["key"] == "ArrowRight" or e["key"] == " ":
         return current_slide + 1
     elif e["key"] == "ArrowLeft":
         return max(current_slide - 1, 0)
@@ -66,23 +72,8 @@ def on_key(e: dict, n_keydowns: int, current_slide: int) -> int:
     Input("slide-index", "data")
 )
 def update_slide(slide: int) -> Tuple[List[Component], dict]:
-    figure, text = build_slide(slide)
-
-    result = []
-    if figure:
-        result.append(dcc.Graph(figure=figure, config={"scrollZoom": True}, style={
-            "flex": "1", "height": "100vh"
-        }))
-    result.append(
-        html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True)), style={
-            "flex": "1", "padding": "1px", "fontSize": "30px",
-            "overflow": "auto"
-        }))
-    if not figure:
-        style = {**base_style, "alignItems": "center"}
-    else:
-        style = {**base_style, "alignItems": "flex-start"}
-    return result, style
+    components, style = build_slide(slide)
+    return components, {**base_style, **style}
 
 
 if __name__ == "__main__":
