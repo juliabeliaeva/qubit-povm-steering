@@ -71,17 +71,20 @@ def get_uniform_povm3() -> QubitPovm:
     mus = [1 / 3, 1 / 3, 1 / 3]
     x1 = np.array([1, 0, 0])
     x2 = Rotation.from_euler(seq='xyz', angles=[0, 0, 2 * np.pi / 3]).as_matrix() @ x1
-    x3 = Rotation.from_euler(seq='xyz', angles=[0, 0, - 2 * np.pi / 3]).as_matrix() @ x1
+    x3 = Rotation.from_euler(seq='xyz', angles=[0, 0, -2 * np.pi / 3]).as_matrix() @ x1
     return QubitPovm([x1, x2, x3], mus, 1)
 
 
 def get_uniform_povm4() -> QubitPovm:
-    mus = [1 / 4, 1 / 4, 1 / 4, 1 / 4]
-    x1 = np.array([1, 1, 1]) / math.sqrt(3)
-    x2 = np.array([1, -1, -1]) / math.sqrt(3)
-    x3 = np.array([-1, 1, -1]) / math.sqrt(3)
-    x4 = np.array([-1, -1, 1]) / math.sqrt(3)
-    return QubitPovm([x1, x2, x3, x4], mus, 1)
+    mus = np.array([1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3])
+    povm31 = get_povm3(mus[0], mus[1], mus[2],
+                       np.array([1, 0, 0]), np.array([0, 1, 0]))
+    povm32 = get_povm3(mus[1], mus[3], mus[4],
+                       -povm31.vectors[1], np.array([0, 0, 1]))
+
+    mu_sum = mus[0] + mus[2] + mus[3] + mus[4]
+    return QubitPovm([povm31.vectors[0], povm31.vectors[2], povm32.vectors[1], povm32.vectors[2]],
+                     [mus[0] / mu_sum, mus[2] / mu_sum, mus[3] / mu_sum, mus[4] / mu_sum], r=1)
 
 
 def add_noise(povm: QubitPovm, r: float) -> QubitPovm:

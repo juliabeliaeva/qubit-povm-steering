@@ -82,8 +82,9 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     slide_builder.next_step()
     slide_builder.add_line(povm3_text['coarse'])
-    slide_builder.hide_traces(parent_traces)
+    slide_builder.next_step()
 
+    slide_builder.hide_traces(parent_traces)
     for sector_angle in sector_angles:
         x = radius * math.cos(sector_angle)
         y = radius * math.sin(sector_angle)
@@ -92,7 +93,6 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
                                            mode='lines', line=dict(color='black', width=2),
                                            name=",".join([str(i + 1) for i in hemisphere_indices])))
 
-    slide_builder.next_step()
     slide_builder.add_line(povm3_text['coarseexplicit'])
     coarse_labels = []
     for sector_angle in sector_angles:

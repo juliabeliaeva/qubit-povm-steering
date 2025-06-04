@@ -8,7 +8,7 @@ from dash_extensions import Keyboard
 
 from povms import get_povm3, get_pvm, get_uniform_povm4
 from presentations.povms.povm3 import plot_flat_povm, plot_flat_povm_proof
-from presentations.povms.povm4 import plot_povm4
+from presentations.povms.povm4 import plot_povm4, plot_povm3_response
 from presentations.povms.pvm import plot_pvm
 from presentations.povms.slides import SlideBuilder, create_title_slide
 
@@ -29,7 +29,9 @@ slides: List[SlideBuilder] = [create_title_slide(title),
                               plot_flat_povm(povm3),
                               plot_flat_povm_proof(),
                               create_title_slide("Parent POVM for 4-outcome measurements", level=2),
-                              plot_povm4(povm4)]
+                              plot_povm4(povm4),
+                              plot_povm3_response()]
+max_slides = sum([s.n_steps for s in slides])
 
 
 def build_slide(step_idx: int) -> Tuple[List[Component], dict]:
@@ -60,7 +62,7 @@ def on_key(e: dict, n_keydowns: int, current_slide: int) -> int:
     if not e or "key" not in e:
         return current_slide
     if e["key"] == "ArrowRight" or e["key"] == " ":
-        return current_slide + 1
+        return min(current_slide + 1, max_slides)
     elif e["key"] == "ArrowLeft":
         return max(current_slide - 1, 0)
     return current_slide

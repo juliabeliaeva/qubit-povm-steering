@@ -20,7 +20,7 @@ $$\sum_a p(a|\{\hat{x}_a\},\hat{\lambda}) \neq 1$$
 Let's fix $p(a|\{\hat{x}_a\},\hat{\lambda})$!
 <!--coarse-->
 Coarse-grained POVM:  
-$$\begin{array}{l}\Pi_A = \int_S d\hat{\lambda} \prod_{a \in A}\Theta(\hat{x}\cdot\hat{\lambda})\prod_{a \notin A}(1 - \Theta(\hat{x}\cdot\hat{\lambda})) \Pi_{\hat{\lambda}},\\A \in \{\{1\}, \{2\}, \{3\}, \{1, 2\}, \{2, 3\}, \{1, 3\}\}\end{array}$$
+$$\begin{array}{l}\Pi_A = \int_S d\hat{\lambda} \prod_{a \in A}\Theta(\hat{x}\cdot\hat{\lambda})\prod_{a \notin A}(1 - \Theta(\hat{x}\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}\\A \in \{\{1\}, \{2\}, \{3\}, \{1, 2\}, \{2, 3\}, \{1, 3\}\}\end{array}$$
 <!--coarseexplicit-->
 $$\begin{align}\Pi_{\{1\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} - \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\\\Pi_{\{1\}^c}=\Pi_{\{2, 3\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} + \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\end{align}$$  
 $$\hat{\lambda}_1 = \frac{\hat{x}_2 + \hat{x}_3}{|\hat{x}_2 + \hat{x}_3|}\text{, } \theta_1 = \arccos{(-\hat{x}_2 \cdot \hat{x}_3)}\text{, }\theta_1 + \theta_2 + \theta_3 = \pi$$
