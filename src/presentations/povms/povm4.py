@@ -8,7 +8,7 @@ from crossections import make_orthogonal
 from latex_util import latex_to_html
 from plotly_utils import get_color
 from povms import QubitPovm, plot_sphere
-from presentations.povms.povms_common import read_md, get_labels
+from presentations.povms.povms_common import read_md
 from presentations.povms.slides import SlideBuilder
 from quantum_utils import normalize
 
@@ -22,7 +22,7 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
 
     slide_builder.add_trace(plot_sphere(radius))
 
-    labels = get_labels(povm)
+    labels = [latex_to_html(f"x̂_{str(i + 1)}") for i in range(povm.n_outcomes)]
     color_sequence = "D3"
     colors = [get_color(color_sequence, 0), get_color(color_sequence, 2), get_color(color_sequence, 1),
               get_color(color_sequence, 3)]

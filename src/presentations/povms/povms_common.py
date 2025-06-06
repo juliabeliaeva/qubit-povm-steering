@@ -5,7 +5,6 @@ from typing import List, Tuple, Set, Dict
 import numpy as np
 import plotly.graph_objects as go
 
-from latex_util import latex_to_html
 from plotly_utils import get_color_with_alpha
 from povms import QubitPovm
 from presentations.povms.slides import SlideBuilder
@@ -49,18 +48,16 @@ def get_angles(povm: QubitPovm) -> List[float]:
             get_angle(povm.vectors[0], povm.vectors[2], normal)]
 
 
-def get_labels(povm: QubitPovm, noise: int = 1) -> List[str]:
-    return get_labels_for_outcomes(povm.n_outcomes, noise)
+def get_labels(povm: QubitPovm) -> List[str]:
+    return get_labels_for_outcomes(povm.n_outcomes)
 
 
-def get_labels_for_outcomes(n_outcomes: int, noise: int):
+def get_labels_for_outcomes(n_outcomes: int):
     if n_outcomes == 2:
-        result = ["x̂", "-x̂"]
+        result = [r"\hat{x}", r"-\hat{x}"]
     else:
-        result = ["x̂_{" + str(i + 1) + "}" for i in range(n_outcomes)]
-    if noise == 1:
-        return [latex_to_html(r) for r in result]
-    return [latex_to_html(r"\frac{" + r + "}{" + str(noise) + "}") for r in result]
+        result = [r"\hat{x}_{" + str(i + 1) + "}" for i in range(n_outcomes)]
+    return [rf"$\Large{r}$" for r in result]
 
 
 def get_response_table_pvm(povm: QubitPovm) -> Dict[Tuple[int, Tuple], float]:
@@ -115,9 +112,9 @@ def plot_povm_vectors(slide_builder: SlideBuilder, vectors: List[Tuple[float, st
                                                                 name=vector_name)))
         label_traces.append(slide_builder.add_trace(go.Scatter(x=[0.5 * x], y=[0.5 * y],
                                                                mode='text',
-                                                               text=["   " + vector_name],
+                                                               text=[vector_name],
                                                                textposition='bottom center',
-                                                               textfont=dict(size=26), zorder=10)))
+                                                               textfont=dict(size=32), zorder=10)))
     vector_traces.append(slide_builder.add_trace(go.Scatter(x=[0], y=[0], mode='markers',
                                                             marker=dict(color='black', size=8), zorder=11)))
     return vector_traces, label_traces
@@ -141,6 +138,5 @@ def update_layout(fig: go.Figure):
     fig.update_layout(xaxis=dict(range=[-2.5, 2.5], showgrid=False, zeroline=False, showticklabels=False),
                       yaxis=dict(range=[-2.5, 2.5], showgrid=False, zeroline=False, showticklabels=False,
                                  scaleanchor="x", scaleratio=1),
-                      font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif"),
                       margin=dict(l=0, r=0, t=0, b=0),
                       plot_bgcolor='white', title=None, showlegend=False)

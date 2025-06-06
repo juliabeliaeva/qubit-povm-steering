@@ -86,13 +86,13 @@ class SlideBuilder:
 
         result = []
         if figure:
-            result.append(dcc.Graph(figure=figure, config={"scrollZoom": True}, style={
+            result.append(dcc.Graph(figure=figure, mathjax=True, config={"scrollZoom": True}, style={
                 "flex": "1", "height": "100vh"
             }))
         result.append(
             html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True)), style={
-                "flex": "1", "padding": "1px", "fontSize": "28px",
-                "overflow": "auto"
+                "flex": "1", "padding": "1px", "fontSize": "26px",
+                "overflow": "auto", "fontFamily": "'Lato', sans-serif"
             }))
         if self.center:
             style = {"alignItems": "center"}

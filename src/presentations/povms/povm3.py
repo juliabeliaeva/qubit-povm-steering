@@ -4,11 +4,10 @@ from typing import Dict, Tuple
 import numpy as np
 from plotly import graph_objects as go
 
-from latex_util import latex_to_html
 from plotly_utils import get_color
 from povms import QubitPovm
-from presentations.povms.povms_common import get_angles, get_labels, plot_povm_vectors, plot_hemispheres, \
-    get_response_table_pvm, plot_response_function, get_hemisphere_indices, update_layout, read_md
+from presentations.povms.povms_common import get_angles, plot_povm_vectors, plot_hemispheres, \
+    get_response_table_pvm, plot_response_function, get_hemisphere_indices, update_layout, read_md, get_labels
 from presentations.povms.slides import SlideBuilder
 
 povm3_text = read_md("data/povm3.md")
@@ -73,9 +72,10 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     sector_traces = []
     for sector_angle in sector_angles:
         hemisphere_indices = get_hemisphere_indices(sector_angle, angles)
+        label = r"$\Large" + ",".join([str(i + 1) for i in hemisphere_indices]) + "$"
         sector_trace = slide_builder.add_trace(go.Scatter(x=[0.8 * radius * math.cos(sector_angle)],
                                                           y=[0.8 * radius * math.sin(sector_angle)],
-                                                          text=[",".join([str(i + 1) for i in hemisphere_indices])],
+                                                          text=[label],
                                                           mode="text", textfont=dict(size=32), zorder=15,
                                                           showlegend=False))
         sector_traces.append(sector_trace)
@@ -104,12 +104,12 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
         else:
             lambda_idx = next(iter(hemisphere_indices))
         sign = "-" if len(hemisphere_indices) == 1 else ""
-        lambda_label = latex_to_html(rf"${sign}\lambda&#770;_" + str(lambda_idx + 1) + "$")
+        lambda_label = rf"$\Large{sign}\hat{{\lambda}}_" + str(lambda_idx + 1) + "$"
         trace_lambda = slide_builder.add_trace(go.Scatter(x=[1.1 * 2 * x], y=[1.1 * 2 * y],
                                                           mode='text', textfont=dict(size=32),
                                                           textposition='middle center', text=[lambda_label]))
         if len(hemisphere_indices) == 1:
-            theta_label = latex_to_html(r"\theta_{" + str(lambda_idx + 1) + "}$")
+            theta_label = r"$\Large\theta_{" + str(lambda_idx + 1) + "}$"
             trace_theta = slide_builder.add_trace(go.Scatter(x=[0.4 * x], y=[0.4 * y],
                                                              mode='text', textfont=dict(size=32), zorder=20,
                                                              textposition='middle center', text=[theta_label]))

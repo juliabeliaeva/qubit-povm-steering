@@ -46,6 +46,8 @@ def build_slide(step_idx: int) -> Tuple[List[Component], dict]:
 base_style = {"display": "flex", "flexDirection": "row",
               "height": "100vh", "width": "100%"}
 app.layout = html.Div([
+    html.Link(href="https://fonts.googleapis.com/css2?family=Lato&display=swap", rel="stylesheet"),
+    html.Link(href="https://fonts.googleapis.com/css2?family=STIX+Two+Math&display=swap", rel="stylesheet"),
     dcc.Store(id="slide-index", data=0),
     Keyboard(id="keyboard", captureKeys=["ArrowRight", "ArrowLeft", " "]),
     html.Div(id='slide-content', children=[], style=base_style),
