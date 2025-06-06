@@ -20,7 +20,7 @@ app.title = title
 pvm = get_pvm()
 povm3 = get_povm3(0.25, 0.32, 0.43,
                   np.array([1, 0, 0]), np.array([0, 1, 0]))
-povm4 = get_uniform_povm4()
+povm4 = get_sample_povm4()
 
 slides: List[SlideBuilder] = [create_title_slide(title),
                               create_title_slide("Parent POVM for projectors", level=2),

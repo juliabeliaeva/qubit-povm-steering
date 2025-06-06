@@ -75,8 +75,8 @@ def get_uniform_povm3() -> QubitPovm:
     return QubitPovm([x1, x2, x3], mus, 1)
 
 
-def get_uniform_povm4() -> QubitPovm:
-    mus = np.array([1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3])
+def get_sample_povm4() -> QubitPovm:
+    mus = np.array([0.25, 0.4, 0.35, 0.4, 0.20])
     povm31 = get_povm3(mus[0], mus[1], mus[2],
                        np.array([1, 0, 0]), np.array([0, 1, 0]))
     povm32 = get_povm3(mus[1], mus[3], mus[4],
