@@ -1,5 +1,4 @@
 <!--pvm-->
-PVM:  
 $$M_{\pm} = \frac{1}{2}\left(\mathbb{I} \pm \hat{x} \cdot \vec{\sigma}\right)$$
 <!--noisypvm-->
 Noisy version:  

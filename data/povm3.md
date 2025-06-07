@@ -1,14 +1,14 @@
 <!--3out-->
-3-outcome POVM:
 $$M_a = \mu_a\left(\mathbb{I} + \hat{x}_a \cdot \vec{\sigma}\right)\text{, } \sum_a \mu_a = 1\text{, } \sum_a \mu_a \hat{x}_a = 0\text{, } \mu_a \ge 0$$
 <!--3outnoisy-->
 Noisy POVM:  
 $$M_a^{r=\frac{1}{2}} = \mu_a\left(\mathbb{I} + \frac{1}{2} \hat{x}_a \cdot \vec{\sigma}\right)$$
 <!--parent-->
-Same parent POVM:  
+Let's use the same parent POVM:  
 $$\Pi_{\hat{\lambda}} = \frac{1}{4\pi}\left(\mathbb{I} + \hat{\lambda} \cdot \vec{\sigma}\right)$$
 <!--simpleresponce-->
 Does a similar response function work?
+
 $$p(a|\{\hat{x}_a\},\hat{\lambda}) = 2\mu_a \Theta(\hat{x}_a\cdot\hat{\lambda})$$
 <!--simpleintegral-->
 We can simulate $M_a^{r=\frac{1}{2}}$:
@@ -38,8 +38,8 @@ Normalized response function:
 |                       | $\Pi_{\{2,3\}}$ | $\Pi_{\{1,3\}}$ | $\Pi_{\{1,2\}}$ | $\Pi_{\{3\}}$ | $\Pi_{\{2\}}$ | $\Pi_{\{1\}}$ |
 |:---------------------:|:---------------:|:---------------:|:---------------:|:-------------:|:-------------:|:-------------:|
 | $M_1^{r=\frac{1}{2}}$ |                 |    $2\mu_1$     |    $2\mu_1$     |               |               |   $2\mu_1$    |
-| $M_2^{r=\frac{1}{2}}$ |  $2\mu_2 - X$   |                 |  $1 - 2\mu_1$   |               |       1       |      $Y$      |
-| $M_3^{r=\frac{1}{2}}$ |  $2\mu_3 - Y$   |  $1 - 2\mu_1$   |                 |       1       |               |      $X$      |
+| $M_2^{r=\frac{1}{2}}$ |  $2\mu_2 - X$   |                 |  $1 - 2\mu_1$   |               |      $1$      |      $Y$      |
+| $M_3^{r=\frac{1}{2}}$ |  $2\mu_3 - Y$   |  $1 - 2\mu_1$   |                 |      $1$      |               |      $X$      |
 <!--simulates-->
 Can we simulate $M_a^{r=\frac{1}{2}}$ with this normalized response function?
 <!--coarsesimple-->
