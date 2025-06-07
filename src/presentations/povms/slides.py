@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Dict, Set, Iterable, List, Tuple, Optional
 
@@ -7,17 +8,28 @@ from dash.development.base_component import Component
 from plotly.basedatatypes import BaseTraceType
 
 
-class SlideBuilder:
-    def __init__(self, center: bool = False):
+class AbstractSlideBuilder(ABC):
+    @property
+    @abstractmethod
+    def n_steps(self):
+        ...
+
+    @abstractmethod
+    def build_components(self, step: int) -> List[Component]:
+        ...
+
+
+class SlideBuilder(AbstractSlideBuilder):
+    def __init__(self, title: Optional[str] = None):
+        self.title = title
         self.current_step: int = 0
         self.visible_traces: Dict[int, Set[int]] = defaultdict(set)
         self.visible_lines: Dict[int, Set[int]] = defaultdict(set)
         self.fig = go.Figure()
         self.lines: List[str] = []
-        self.center = center
 
     @property
-    def n_steps(self):
+    def n_steps(self) -> int:
         return max([*self.visible_traces.keys(), *self.visible_lines.keys()]) + 1
 
     def add_line(self, line: str) -> int:
@@ -81,33 +93,42 @@ class SlideBuilder:
 
         return self.fig, text
 
-    def build_components(self, step: int) -> Tuple[List[Component], dict]:
+    def build_components(self, step: int) -> List[Component]:
+        title = html.H2(self.title,
+                        style={"width": "100%", "textAlign": "center", "margin": "16px 0"}) if self.title else None
+
         figure, text = self.build(step)
 
-        result = []
+        content = []
         if figure:
-            result.append(dcc.Graph(figure=figure, mathjax=True, config={"scrollZoom": True}, style={
-                "flex": "1", "height": "100vh"
-            }))
-        result.append(
-            html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True)), style={
-                "flex": "1", "padding": "1px", "fontSize": "26px",
-                "overflow": "auto", "fontFamily": "'Lato', sans-serif"
-            }))
-        if self.center:
-            style = {"alignItems": "center"}
-        else:
-            style = {"alignItems": "flex-start"}
-        return result, style
+            content.append(dcc.Graph(figure=figure, mathjax=True, config={"scrollZoom": True}))
+
+        text_style = {"flex": "1", "padding": "1px", "overflow": "auto"}
+        if not figure:
+            text_style = {**text_style, "paddingLeft": "20px"}
+        content.append(html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True)),
+                                style=text_style))
+
+        row = html.Div(content, style={"display": "flex", "flexDirection": "row", "flex": "1", "width": "100%"})
+        layout = [title, row] if title else [row]
+
+        return [html.Div(layout, style={"display": "flex", "flexDirection": "column", "height": "100%",
+                                        "width": "100%", "alignItems": "flex-start"})]
 
 
-def create_text_slide(text: str) -> SlideBuilder:
-    slide_builder = SlideBuilder(center=True)
-    slide_builder.add_line(text)
-    return slide_builder
+class TitleSlideBuilder(AbstractSlideBuilder):
+    def __init__(self, title: str, level: int = 1):
+        self.title = title
+        self.level = level
 
+    @property
+    def n_steps(self):
+        return 1
 
-def create_title_slide(title: str, level: int = 1) -> SlideBuilder:
-    slide_builder = SlideBuilder(center=True)
-    slide_builder.add_line(f"<p style=\"text-align:center;\"><h{level}>{title}</h{level}></p>")
-    return slide_builder
+    def build_components(self, step: int) -> List[Component]:
+        heading_constructor = [html.H1, html.H2, html.H3, html.H4, html.H5, html.H6][self.level - 1]
+        heading = heading_constructor(self.title,
+                                      style={'textAlign': "center", 'fontFamily': "'Lato', sans-serif"})
+        return [html.Div(children=[heading],
+                         style={"display": "flex", "justifyContent": "center", "alignItems": "center",
+                                "height": "100vh", "width": "100vw"})]

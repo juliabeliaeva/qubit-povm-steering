@@ -57,7 +57,7 @@ def get_labels_for_outcomes(n_outcomes: int):
         result = [r"\hat{x}", r"-\hat{x}"]
     else:
         result = [r"\hat{x}_{" + str(i + 1) + "}" for i in range(n_outcomes)]
-    return [rf"$\Large{r}$" for r in result]
+    return [rf"${r}$" for r in result]
 
 
 def get_response_table_pvm(povm: QubitPovm) -> Dict[Tuple[int, Tuple], float]:

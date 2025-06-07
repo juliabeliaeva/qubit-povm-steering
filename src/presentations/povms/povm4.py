@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List, Callable
 
 import numpy as np
 import plotly.graph_objects as go
@@ -16,9 +16,9 @@ povm4_text = read_md("data/povm4.md")
 
 
 def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
-    slide_builder = SlideBuilder()
+    slide_builder = SlideBuilder("4-Outcome POVMs")
     slide_builder.add_line(povm4_text['4out'])
-    slide_builder.add_line(povm4_text['4outnoisy'])
+    # slide_builder.add_line(povm4_text['4outnoisy'])
 
     slide_builder.add_trace(plot_sphere(radius))
 
@@ -78,6 +78,12 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
     slide_builder.next_step()
     slide_builder.add_line(povm4_text['povm3weknow'])
 
+    update_layout(slide_builder)
+
+    return slide_builder
+
+
+def update_layout(slide_builder: SlideBuilder):
     eye_distance = 1.2
     slide_builder.fig.update_layout(scene=dict(xaxis=dict(visible=False),
                                                yaxis=dict(visible=False),
@@ -89,11 +95,9 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
                                     margin=dict(l=0, r=0, t=0, b=0),
                                     plot_bgcolor='white', title=None, showlegend=False)
 
-    return slide_builder
-
 
 def plot_povm3_response() -> SlideBuilder:
-    slide_builder = SlideBuilder()
+    slide_builder = SlideBuilder("Response Functions for Coarse-Grained POVMs")
     slide_builder.add_line(povm4_text['responsepm'])
     return slide_builder
 

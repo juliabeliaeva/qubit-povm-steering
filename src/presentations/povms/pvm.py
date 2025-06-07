@@ -13,7 +13,7 @@ from presentations.povms.slides import SlideBuilder
 pvm_text: Dict[str, str] = read_md("data/pvm.md")
 
 def plot_pvm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
-    slide_builder = SlideBuilder()
+    slide_builder = SlideBuilder("Projectors")
 
     slide_builder.add_line(pvm_text['pvm'])
 
@@ -30,8 +30,8 @@ def plot_pvm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder.next_step()
 
     slide_builder.add_line(pvm_text['noisypvm'])
-
     slide_builder.next_step()
+
     slide_builder.add_line(pvm_text['parentpvm'])
 
     line_angles = [2 * np.pi * i / num_lines for i in range(num_lines)]

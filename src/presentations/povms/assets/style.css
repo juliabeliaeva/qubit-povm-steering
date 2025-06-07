@@ -1,0 +1,18 @@
+body {
+    font-size: 24px;
+    font-family: 'Lato', sans-serif;
+}
+
+h1 {
+    font-size: 60px;
+}
+
+h2 {
+    font-size: 40px;
+}
+
+table, th, td {
+  border: 1px solid lightgray;
+  border-collapse: collapse;
+  padding: 5px;
+}
