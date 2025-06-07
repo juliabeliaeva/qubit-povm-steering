@@ -94,9 +94,8 @@ class SlideBuilder(AbstractSlideBuilder):
         return self.fig, text
 
     def build_components(self, step: int) -> List[Component]:
-        title = html.H2(self.title,
-                        style={"width": "100%", "textAlign": "center", "margin": "16px 0"}) if self.title else None
-
+        title = dcc.Markdown(f"## {self.title}", mathjax=True, className="slide-title",
+                             style={"textAlign": "center", "width": "100%"}) if self.title else None
         figure, text = self.build(step)
 
         content = []
