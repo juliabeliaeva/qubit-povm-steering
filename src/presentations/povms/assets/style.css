@@ -3,6 +3,14 @@ body {
     font-family: 'Lato', sans-serif;
 }
 
+.text-slide-text {
+    font-size: 26px;
+}
+
+.figure-slide-text {
+    font-size: 28px;
+}
+
 h1 {
     font-size: 60px;
 }
@@ -12,7 +20,7 @@ h2 {
 }
 
 table, th, td {
-  border: 1px solid lightgray;
-  border-collapse: collapse;
-  padding: 5px;
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+    padding: 5px;
 }

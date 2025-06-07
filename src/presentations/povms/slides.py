@@ -106,8 +106,11 @@ class SlideBuilder(AbstractSlideBuilder):
         text_style = {"flex": "1", "padding": "1px", "overflow": "auto"}
         if not figure:
             text_style = {**text_style, "paddingLeft": "20px"}
+            class_name = "text-slide-text"
+        else:
+            class_name = "figure-slide-text"
         content.append(html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True)),
-                                style=text_style))
+                                className=class_name, style=text_style))
 
         row = html.Div(content, style={"display": "flex", "flexDirection": "row", "flex": "1", "width": "100%"})
         layout = [title, row] if title else [row]
