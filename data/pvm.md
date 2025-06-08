@@ -1,5 +1,7 @@
 <!--pvm-->
 $$M_{\pm} = \frac{1}{2}\left(\mathbb{I} \pm \hat{x} \cdot \vec{\sigma}\right)$$
+<!--noisypvm2-->
+$$M_{\pm} = \frac{1}{2}\left(\mathbb{I} \pm \hat{x} \cdot \vec{\sigma}\right) \xrightarrow{\text{noise}} M_{\pm}^{r=\frac{1}{2}} = \frac{1}{2}\left(\mathbb{I} \pm \frac{1}{2} \hat{x} \cdot \vec{\sigma}\right)$$
 <!--noisypvm-->
 Noisy version:  
 $$M_{\pm}^{r=\frac{1}{2}} = \frac{1}{2}\left(\mathbb{I} \pm \frac{1}{2} \hat{x} \cdot \vec{\sigma}\right)$$

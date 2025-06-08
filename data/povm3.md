@@ -18,14 +18,20 @@ But it's not normalized:
 $$\sum_a p(a|\{\hat{x}_a\},\hat{\lambda}) \neq 1$$
 <!--letsfix-->
 Let's fix $p(a|\{\hat{x}_a\},\hat{\lambda})$!
+<!--6regions-->
+6 regions: $A \in \{\{1\}, \{2\}, \{3\}, \{1, 2\}, \{2, 3\}, \{1, 3\}\}$
 <!--coarse-->
 Coarse-grained POVM:  
-$$\begin{array}{l}\Pi_A = \int_S d\hat{\lambda} \prod_{a \in A}\Theta(\hat{x}\cdot\hat{\lambda})\prod_{a \notin A}(1 - \Theta(\hat{x}\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}\\A \in \{\{1\}, \{2\}, \{3\}, \{1, 2\}, \{2, 3\}, \{1, 3\}\}\end{array}$$
+$$\Pi_A = \int_S d\hat{\lambda} \prod_{a \in A}\Theta(\hat{x}_a\cdot\hat{\lambda})\prod_{a' \notin A}(1 - \Theta(\hat{x}_{a'}\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}$$
 <!--coarseexplicit-->
 $$\begin{align}\Pi_{\{1\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} - \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\\\Pi_{\{1\}^c}=\Pi_{\{2, 3\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} + \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\end{align}$$  
 $$\hat{\lambda}_1 = \frac{\hat{x}_2 + \hat{x}_3}{|\hat{x}_2 + \hat{x}_3|}\text{, } \theta_1 = \arccos{(-\hat{x}_2 \cdot \hat{x}_3)}\text{, }\theta_1 + \theta_2 + \theta_3 = \pi$$
+<!--coarsesim-->
+Goal:
+
+$$\Pi_{\hat{\lambda}} \xrightarrow{\text{simulates}} \Pi_A \xrightarrow{\text{simulates ?}} M_a^{r=\frac{1}{2}}$$
 <!--responceunnorm-->
-Unnormalized response function:
+Original (unnormalized) response function:
 
 |                       | $\Pi_{\{2,3\}}$ | $\Pi_{\{1,3\}}$ | $\Pi_{\{1,2\}}$ | $\Pi_{\{3\}}$ | $\Pi_{\{2\}}$ | $\Pi_{\{1\}}$ |
 |:---------------------:|:---------------:|:---------------:|:---------------:|:-------------:|:-------------:|:-------------:|
@@ -33,15 +39,17 @@ Unnormalized response function:
 | $M_2^{r=\frac{1}{2}}$ |    $2\mu_2$     |                 |    $2\mu_2$     |               |   $2\mu_2$    |               |
 | $M_3^{r=\frac{1}{2}}$ |    $2\mu_3$     |    $2\mu_3$     |                 |   $2\mu_3$    |               |               |
 <!--responcenorm-->
-Normalized response function:
+Modified response function:
 
 |                       | $\Pi_{\{2,3\}}$ | $\Pi_{\{1,3\}}$ | $\Pi_{\{1,2\}}$ | $\Pi_{\{3\}}$ | $\Pi_{\{2\}}$ | $\Pi_{\{1\}}$ |
 |:---------------------:|:---------------:|:---------------:|:---------------:|:-------------:|:-------------:|:-------------:|
 | $M_1^{r=\frac{1}{2}}$ |                 |    $2\mu_1$     |    $2\mu_1$     |               |               |   $2\mu_1$    |
 | $M_2^{r=\frac{1}{2}}$ |  $2\mu_2 - X$   |                 |  $1 - 2\mu_1$   |               |      $1$      |      $Y$      |
 | $M_3^{r=\frac{1}{2}}$ |  $2\mu_3 - Y$   |  $1 - 2\mu_1$   |                 |      $1$      |               |      $X$      |
+
+This function is normalized if $2 \mu_1 + X + Y = 1$.
 <!--simulates-->
-Can we simulate $M_a^{r=\frac{1}{2}}$ with this normalized response function?
+Can we simulate $M_a^{r=\frac{1}{2}}$ with the modified response function?
 <!--coarsesimple-->
 Coarse-grained POVM:
 $$\begin{align}
@@ -99,9 +107,10 @@ $$
 (1 - 2\mu_1)\theta_3 + \theta_2 + (2\mu_2 - X)\theta_1 + (1 - 2\mu_1 - X)\theta_1 = 2 \mu_2 (\theta_1 + \theta_2 + \theta_3)
 $$
 <!--coarseneedi3-->
-$$
-X = \frac{\theta_1(1-2\mu_1) - \theta_2(1-2\mu_2) + \theta_3(1-2\mu_3)}{2\theta_1}
-$$
+$$\begin{aligned}
+X &= \frac{\theta_1(1-2\mu_1) - \theta_2(1-2\mu_2) + \theta_3(1-2\mu_3)}{2\theta_1}\\
+Y &= \frac{\theta_1(1-2\mu_1) + \theta_2(1-2\mu_2) - \theta_3(1-2\mu_3)}{2\theta_1}
+\end{aligned}$$
 <!--coarseneedsigma1-->
 Coefficients in front of $\vec{\sigma}$:
 $$

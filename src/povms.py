@@ -91,12 +91,12 @@ def add_noise(povm: QubitPovm, r: float) -> QubitPovm:
     return QubitPovm(povm.vectors, povm.mus, povm.r * r)
 
 
-def plot_sphere(radius: float = 1) -> BaseTraceType:
+def plot_sphere(center: np.ndarray = np.zeros(3), radius: float = 1) -> BaseTraceType:
     u, v = np.mgrid[0:2 * np.pi:60j, 0:np.pi:30j]
-    xs = radius * np.cos(u) * np.sin(v)
-    ys = radius * np.sin(u) * np.sin(v)
-    zs = radius * np.cos(v)
-    return go.Surface(x=xs, y=ys, z=zs, opacity=0.03, showscale=False)
+    xs = radius * np.cos(u) * np.sin(v) + center[0]
+    ys = radius * np.sin(u) * np.sin(v) + center[1]
+    zs = radius * np.cos(v) + center[2]
+    return go.Surface(x=xs, y=ys, z=zs, opacity=0.03, showscale=False, hoverinfo='skip')
 
 
 def plot_povm(povm: QubitPovm) -> go.Figure:

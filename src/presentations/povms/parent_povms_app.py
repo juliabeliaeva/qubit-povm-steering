@@ -23,14 +23,15 @@ povm3 = get_povm3(0.25, 0.32, 0.43,
 povm4 = get_sample_povm4()
 
 slides: List[AbstractSlideBuilder] = [TitleSlideBuilder(title, 1),
-                                      TitleSlideBuilder("Parent POVM for projectors", level=2),
+                                      TitleSlideBuilder("Parent POVM for Projectors", level=2),
                                       plot_pvm(pvm),
-                                      TitleSlideBuilder("Parent POVM for 3-outcome measurements", level=2),
+                                      TitleSlideBuilder("Parent POVM for 3-Outcome Measurements", level=2),
                                       plot_flat_povm(povm3),
                                       plot_flat_povm_proof(),
-                                      TitleSlideBuilder("Parent POVM for 4-outcome measurements", level=2),
+                                      TitleSlideBuilder("Parent POVM for 4-Outcome Measurements", level=2),
                                       plot_povm4(povm4),
-                                      plot_povm3_response()]
+                                      plot_povm3_response(),
+                                      plot_povm4_hemispheres(povm4)]
 max_slides = sum([s.n_steps for s in slides])
 
 

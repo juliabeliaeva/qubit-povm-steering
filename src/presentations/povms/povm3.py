@@ -80,6 +80,7 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
                                                           showlegend=False))
         sector_traces.append(sector_trace)
 
+    slide_builder.add_line(povm3_text['6regions'])
     slide_builder.next_step()
     slide_builder.add_line(povm3_text['coarse'])
     slide_builder.next_step()
@@ -117,6 +118,8 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
         coarse_labels.append(trace_lambda)
 
+    slide_builder.next_step()
+    slide_builder.add_line(povm3_text['coarsesim'])
     slide_builder.next_step()
     slide_builder.hide_traces(coarse_labels)
     slide_builder.hide_all_lines()

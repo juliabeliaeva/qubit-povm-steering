@@ -15,7 +15,7 @@ pvm_text: Dict[str, str] = read_md("data/pvm.md")
 def plot_pvm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder = SlideBuilder("Projectors")
 
-    slide_builder.add_line(pvm_text['pvm'])
+    pvm_line = slide_builder.add_line(pvm_text['pvm'])
 
     slide_builder.fig.add_shape(type="circle", xref="x", yref="y",
                                 x0=-radius, y0=-radius, x1=radius, y1=radius,
@@ -29,7 +29,8 @@ def plot_pvm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     plot_povm_vectors(slide_builder, vectors, radius)
     slide_builder.next_step()
 
-    slide_builder.add_line(pvm_text['noisypvm'])
+    slide_builder.hide_line(pvm_line)
+    slide_builder.add_line(pvm_text['noisypvm2'])
     slide_builder.next_step()
 
     slide_builder.add_line(pvm_text['parentpvm'])
