@@ -7,7 +7,7 @@ from plotly.basedatatypes import BaseTraceType
 from scipy.spatial import ConvexHull
 
 from latex_util import latex_to_html
-from plotly_utils import get_color, mix_colors, parse_rgb, mix_three_colors
+from plotly_utils import get_color, parse_rgb, mix_color_uniform
 from povms import QubitPovm, plot_sphere
 from presentations.povms.povms_common import read_md
 from presentations.povms.slides import SlideBuilder
@@ -61,7 +61,6 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
                                              text=[label], textposition='middle center'))
     slide_builder.next_step()
 
-    # circles = [get_circle(povm.vectors[0], povm.vectors[1]), get_circle(povm.vectors[2], povm.vectors[3])]
     triangle1_points = np.vstack([povm.vectors[0], povm.vectors[1], x5, povm.vectors[0]])
     triangle2_points = np.vstack([povm.vectors[2], povm.vectors[3], -x5, povm.vectors[2]])
     for tp, color in zip([triangle1_points, triangle2_points], x5_colors):
@@ -113,7 +112,7 @@ def update_layout(slide_builder: SlideBuilder):
                                                                z=eye_distance * 1)),
                                     font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif"),
                                     margin=dict(l=0, r=0, t=0, b=0),
-                                    plot_bgcolor='white', title=None, showlegend=False)
+                                    plot_bgcolor='white', title=None, showlegend=False, hovermode=False)
 
 
 def plot_povm3_response() -> SlideBuilder:
@@ -148,9 +147,8 @@ def plot_povm4_hemispheres(povm: QubitPovm, radius=1) -> SlideBuilder:
     slide_builder.hide_trace(sphere_trace1)
     slide_builder.hide_trace(sphere_trace2)
 
-    white = "rgb(255, 255, 255)"
-    regions_plus = plot_regions(center1, vectors_plus, [*colors_plus[:2], white])
-    regions_minus = plot_regions(center2, vectors_minus, [*colors_minus[:2], white])
+    regions_plus = plot_regions(center1, vectors_plus, [*colors_plus[:2], "rgb(255, 255, 255)"])
+    regions_minus = plot_regions(center2, vectors_minus, [*colors_minus[:2], "rgb(0, 0, 0)"])
     [slide_builder.add_trace(r) for r in regions_plus + regions_minus]
 
     update_layout(slide_builder)
@@ -207,29 +205,18 @@ def get_hemisphere_indices(point: np.ndarray, vectors: List[np.ndarray]) -> Tupl
     return result
 
 
+def get_region_color(hemisphere_idx: Tuple[int, ...], colors: List[str]) -> str:
+    region_color = mix_color_uniform([parse_rgb(colors[i]) for i in hemisphere_idx])
+    return f"rgb({region_color[0]}, {region_color[1]}, {region_color[2]})"
+
+
 def plot_regions(center: np.ndarray, vectors: List[np.ndarray], colors: List[str],
                  n: int = 20000) -> List[BaseTraceType]:
     sphere_x, sphere_y, sphere_z = get_sphere_points(n)
     points = np.stack((sphere_x, sphere_y, sphere_z), axis=-1)
 
-    def get_color(hemisphere_idx: Tuple[int, ...]) -> str:
-        if len(hemisphere_idx) == 1:
-            primary_color = parse_rgb(colors[hemisphere_idx[0]])
-        elif len(hemisphere_idx) == 2:
-            primary_color1 = colors[hemisphere_idx[0]]
-            primary_color2 = colors[hemisphere_idx[1]]
-            primary_color = mix_colors(parse_rgb(primary_color1), parse_rgb(primary_color2), 0.5)
-        else:
-            primary_color1 = colors[hemisphere_idx[0]]
-            primary_color2 = colors[hemisphere_idx[1]]
-            primary_color3 = colors[hemisphere_idx[2]]
-            primary_color = mix_three_colors(parse_rgb(primary_color1), parse_rgb(primary_color2),
-                                             parse_rgb(primary_color3),
-                                             1 / 3, 1 / 3)
-        return f"rgb({primary_color[0]}, {primary_color[1]}, {primary_color[2]})"
-
     hemispheres = [(0,), (0, 1), (1,), (1, 2), (2,), (0, 2)]
-    hemisphere_colors = [get_color(h) for h in hemispheres]
+    hemisphere_colors = [get_region_color(h, colors) for h in hemispheres]
     region_indices = [hemispheres.index(get_hemisphere_indices(p, vectors)) for p in points]
 
     normal = normalize(np.cross(vectors[0], vectors[1]))
