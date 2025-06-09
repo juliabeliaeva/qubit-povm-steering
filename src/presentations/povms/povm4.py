@@ -287,6 +287,12 @@ def get_arc_points(p1: np.ndarray, p2: np.ndarray) -> np.ndarray:
     if np.linalg.norm(p1 - p2) < 1e-4:
         return np.vstack([p1, (p1 + p2) / 2, p2])
 
+    angle = np.arccos(np.clip(np.dot(p1, p2), -1, 1))
+    num_points = max(2, int(angle * 100 / np.pi))
+    t_values = np.linspace(0, 1, num_points + 1)
+    return (np.outer(np.sin((1 - t_values) * angle), p1) +
+            np.outer(np.sin(t_values * angle), p2)) / np.sin(angle)
+
 
 def plot_18regions(center: np.ndarray, vectors1: List[np.ndarray], colors1: List[str],
                    vectors2: List[np.ndarray], colors2: List[str],
@@ -300,7 +306,7 @@ def plot_18regions(center: np.ndarray, vectors1: List[np.ndarray], colors1: List
     region_indices1 = [hemispheres.index(get_hemisphere_indices(p, vectors1)) for p in points]
     region_indices2 = [hemispheres.index(get_hemisphere_indices(p, vectors2)) for p in points]
 
-    normal = normalize(np.cross(vectors1[0], vectors1[1]))
+    normal1 = normalize(np.cross(vectors1[0], vectors1[1]))
 
     result = []
     for i, h in enumerate(hemispheres):
@@ -310,12 +316,43 @@ def plot_18regions(center: np.ndarray, vectors1: List[np.ndarray], colors1: List
         else:
             hemispheres2 = [(1, 2), (2,), (0, 2)]
 
+        borders1 = get_border_normals(i, hemispheres, vectors1)
+        borders2 = get_border_normals(1, hemispheres2, vectors2)
+
+        top_corner = normal1
+        bottom_corner = -normal1
+        top_middle_corner_left = -normalize(np.cross(borders1[0][0], borders2[0][0]))
+        top_middle_corner_right = -normalize(np.cross(borders1[1][0], borders2[0][0]))
+        bottom_middle_corner_left = -normalize(np.cross(borders1[0][0], borders2[1][0]))
+        bottom_middle_corner_right = -normalize(np.cross(borders1[1][0], borders2[1][0]))
+
         h_idx = [hemispheres.index(hh) for hh in hemispheres2]
         for j in h_idx:
             mask2 = np.array(region_indices2) == j
             filtered_points = points[mask & mask2]
             if len(filtered_points) < 4:
                 continue
+
+            border_points = None
+            if j == 2 or j == 3:
+                a1 = get_arc_points(top_corner, top_middle_corner_left)
+                a2 = get_arc_points(top_middle_corner_left, top_middle_corner_right)
+                a3 = get_arc_points(top_middle_corner_right, top_corner)
+                border_points = np.vstack([a1, a2, a3])
+            elif j == 1 or j == 4:
+                a1 = get_arc_points(top_middle_corner_left, bottom_middle_corner_left)
+                a2 = get_arc_points(bottom_middle_corner_left, bottom_middle_corner_right)
+                a3 = get_arc_points(bottom_middle_corner_right, top_middle_corner_right)
+                a4 = get_arc_points(top_middle_corner_right, top_middle_corner_left)
+                border_points = np.vstack([a1, a2, a3, a4])
+            elif j == 0 or j == 5:
+                a1 = get_arc_points(bottom_corner, bottom_middle_corner_right)
+                a2 = get_arc_points(bottom_middle_corner_right, bottom_middle_corner_left)
+                a3 = get_arc_points(bottom_middle_corner_left, bottom_corner)
+                border_points = np.vstack([a1, a2, a3])
+
+            if border_points is not None:
+                filtered_points = np.vstack([filtered_points, border_points])
 
             surface_simplices = get_surface_simplices(filtered_points)
             region_color = mix_color_uniform([hemisphere_colors1[i], hemisphere_colors2[j]])
