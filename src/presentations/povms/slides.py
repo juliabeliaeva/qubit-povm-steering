@@ -44,6 +44,12 @@ class SlideBuilder(AbstractSlideBuilder):
         self.visible_traces[self.current_step].add(trace_id)
         return trace_id
 
+    def add_traces(self, traces: List[BaseTraceType]) -> List[int]:
+        result = []
+        for t in traces:
+            result.append(self.add_trace(t))
+        return result
+
     def next_step(self):
         previous_step = self.current_step
 

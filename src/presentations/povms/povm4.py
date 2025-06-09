@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import numpy as np
 import plotly.graph_objects as go
@@ -7,7 +7,7 @@ from plotly.basedatatypes import BaseTraceType
 from scipy.spatial import ConvexHull
 
 from latex_util import latex_to_html
-from plotly_utils import get_color, parse_rgb, mix_color_uniform
+from plotly_utils import get_color, parse_rgb, mix_color_uniform, rgb_to_str
 from povms import QubitPovm, plot_sphere
 from presentations.povms.povms_common import read_md
 from presentations.povms.slides import SlideBuilder
@@ -18,6 +18,7 @@ povm4_text = read_md("data/povm4.md")
 color_sequence = "D3"
 vector_color_ids = [0, 2, 3, 8]
 x5_color_ids = [7, 7]
+x5_labels = [latex_to_html("x̂_{5^{+}}"), latex_to_html("x̂_{5^{-}}")]
 
 
 def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
@@ -28,37 +29,15 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
 
     labels = [latex_to_html(f"x̂_{str(i + 1)}") for i in range(povm.n_outcomes)]
     colors = [get_color(color_sequence, i) for i in vector_color_ids]
-    for vec, mu, label, color in zip(povm.vectors, povm.mus, labels, colors):
-        slide_builder.add_trace(go.Scatter3d(x=[0, radius * vec[0]],
-                                             y=[0, radius * vec[1]],
-                                             z=[0, radius * vec[2]],
-                                             mode='lines',
-                                             line=dict(width=5, color=color)))
-        slide_builder.add_trace(go.Scatter3d(x=[1.1 * radius * vec[0]],
-                                             y=[1.1 * radius * vec[1]],
-                                             z=[1.1 * radius * vec[2]],
-                                             mode='text', textfont=dict(size=30),
-                                             text=[label], textposition='middle center'))
+    plot_vectors(slide_builder, povm.vectors, colors, labels, radius=radius)
 
     slide_builder.next_step()
-
     slide_builder.add_line(povm4_text['pseudo1'])
 
     x5, mu5 = get_x5_mu5(povm)
-
     x5_colors = [get_color(color_sequence, i) for i in x5_color_ids]
-    x5_labels = [latex_to_html("x̂_{5^{+}}"), latex_to_html("x̂_{5^{-}}")]
-    for x, color, label in zip([x5, -x5], x5_colors, x5_labels):
-        slide_builder.add_trace(go.Scatter3d(x=[0, radius * x[0]],
-                                             y=[0, radius * x[1]],
-                                             z=[0, radius * x[2]],
-                                             mode='lines',
-                                             line=dict(width=5, color=color)))
-        slide_builder.add_trace(go.Scatter3d(x=[1.1 * radius * x[0]],
-                                             y=[1.1 * radius * x[1]],
-                                             z=[1.1 * radius * x[2]],
-                                             mode='text', textfont=dict(size=30),
-                                             text=[label], textposition='middle center'))
+    plot_vectors(slide_builder, [x5, -x5], x5_colors, x5_labels)
+
     slide_builder.next_step()
 
     triangle1_points = np.vstack([povm.vectors[0], povm.vectors[1], x5, povm.vectors[0]])
@@ -112,7 +91,7 @@ def update_layout(slide_builder: SlideBuilder):
                                                                z=eye_distance * 1)),
                                     font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif"),
                                     margin=dict(l=0, r=0, t=0, b=0),
-                                    plot_bgcolor='white', title=None, showlegend=False, hovermode=False)
+                                    plot_bgcolor='white', title=None, showlegend=False)
 
 
 def plot_povm3_response() -> SlideBuilder:
@@ -121,7 +100,7 @@ def plot_povm3_response() -> SlideBuilder:
     return slide_builder
 
 
-def plot_povm4_hemispheres(povm: QubitPovm, radius=1) -> SlideBuilder:
+def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
     slide_builder = SlideBuilder("Merging $\\operatorname{POVM}_+$ and $\\operatorname{POVM}_-$")
 
     center1 = np.array([0, -1.3 * radius, 0])
@@ -139,17 +118,50 @@ def plot_povm4_hemispheres(povm: QubitPovm, radius=1) -> SlideBuilder:
     vectors_minus = [povm.vectors[2], povm.vectors[3], -x5]
     colors_plus = [*colors[:2], get_color(color_sequence, x5_color_ids[0])]
     colors_minus = [*colors[2:], get_color(color_sequence, x5_color_ids[1])]
+    labels = [latex_to_html(f"x̂_{str(i + 1)}") for i in range(povm.n_outcomes)]
+    labels_plus = [*labels[:2], x5_labels[0]]
+    labels_minus = [*labels[2:], x5_labels[1]]
 
-    plot_vectors(slide_builder, vectors_plus, colors_plus, center=center1, radius=radius)
-    plot_vectors(slide_builder, vectors_minus, colors_minus, center=center2, radius=radius)
+    vector_traces1 = plot_vectors(slide_builder, vectors_plus, colors_plus, labels_plus, center=center1,
+                                  radius=radius)
+    vector_traces2 = plot_vectors(slide_builder, vectors_minus, colors_minus, labels_minus, center=center2,
+                                  radius=radius)
 
     slide_builder.next_step()
     slide_builder.hide_trace(sphere_trace1)
     slide_builder.hide_trace(sphere_trace2)
 
-    regions_plus = plot_regions(center1, vectors_plus, [*colors_plus[:2], "rgb(255, 255, 255)"])
-    regions_minus = plot_regions(center2, vectors_minus, [*colors_minus[:2], "rgb(0, 0, 0)"])
-    [slide_builder.add_trace(r) for r in regions_plus + regions_minus]
+    region_colors_plus = [*colors_plus[:2], "rgb(255, 255, 255)"]
+    region_color_minus = [*colors_minus[:2], "rgb(0, 0, 0)"]
+
+    regions_plus = plot_6regions(center1, vectors_plus, region_colors_plus, alpha=0.5)
+    regions_minus = plot_6regions(center2, vectors_minus, region_color_minus, alpha=0.5)
+    traces_6regions = slide_builder.add_traces(regions_plus + regions_minus)
+
+    circle_traces = []
+    for c, v in zip([center1] * 3 + [center2] * 3, vectors_plus + vectors_minus):
+        circle_x, circle_y, circle_z = get_circle_points(c, v, radius=1.0005, num_points=200)
+        circle_traces.append(slide_builder.add_trace(go.Scatter3d(x=circle_x, y=circle_y, z=circle_z,
+                                                                  mode='lines', line={"width": 3, "color": "black"})))
+
+    slide_builder.next_step()
+    slide_builder.hide_traces(vector_traces1 + vector_traces2)
+    slide_builder.hide_traces(traces_6regions + circle_traces)
+
+    regions_plus = plot_6regions(center1, vectors_plus, region_colors_plus)
+    regions_minus = plot_6regions(center2, vectors_minus, region_color_minus)
+    traces_6regions = slide_builder.add_traces(regions_plus + regions_minus)
+
+    slide_builder.next_step()
+    slide_builder.hide_traces(traces_6regions)
+
+    regions_plus2 = plot_6regions(np.array([0, -2.3 * radius, 0]), vectors_plus,
+                                  region_colors_plus)
+    regions_minus2 = plot_6regions(np.array([0, 2.3 * radius, 0]), vectors_minus, region_color_minus)
+    slide_builder.add_traces(regions_plus2 + regions_minus2)
+    slide_builder.add_traces(plot_18regions(np.array([0, 0, 0]),
+                                            vectors_plus, region_colors_plus,
+                                            vectors_minus, region_color_minus))
 
     update_layout(slide_builder)
 
@@ -178,14 +190,24 @@ def get_x5_mu5(povm: QubitPovm) -> Tuple[np.ndarray, float]:
 
 
 def plot_vectors(slide_builder: SlideBuilder, vectors: List[np.ndarray], colors: List[str],
+                 labels: Optional[List[str]] = None,
                  center: np.ndarray = np.zeros(3), radius: float = 1) -> List[int]:
+    if not labels:
+        labels = [""] * len(vectors)
+
     traces = []
-    for x, color in zip(vectors, colors):
+    for x, color, label in zip(vectors, colors, labels):
         traces.append(slide_builder.add_trace(go.Scatter3d(x=[center[0], radius * x[0] + center[0]],
                                                            y=[center[1], radius * x[1] + center[1]],
                                                            z=[center[2], radius * x[2] + center[2]],
                                                            mode='lines',
                                                            line=dict(width=5, color=color))))
+        if label:
+            traces.append(slide_builder.add_trace(go.Scatter3d(x=[1.1 * radius * x[0] + center[0]],
+                                                               y=[1.1 * radius * x[1] + center[1]],
+                                                               z=[1.1 * radius * x[2] + center[2]],
+                                                               mode='text', textfont=dict(size=30),
+                                                               text=[label], textposition='middle center')))
     return traces
 
 
@@ -205,13 +227,12 @@ def get_hemisphere_indices(point: np.ndarray, vectors: List[np.ndarray]) -> Tupl
     return result
 
 
-def get_region_color(hemisphere_idx: Tuple[int, ...], colors: List[str]) -> str:
-    region_color = mix_color_uniform([parse_rgb(colors[i]) for i in hemisphere_idx])
-    return f"rgb({region_color[0]}, {region_color[1]}, {region_color[2]})"
+def get_region_color(hemisphere_idx: Tuple[int, ...], colors: List[str]) -> Tuple[int, int, int]:
+    return mix_color_uniform([parse_rgb(colors[i]) for i in hemisphere_idx])
 
 
-def plot_regions(center: np.ndarray, vectors: List[np.ndarray], colors: List[str],
-                 n: int = 20000) -> List[BaseTraceType]:
+def plot_6regions(center: np.ndarray, vectors: List[np.ndarray], colors: List[str],
+                  n: int = 10000, alpha: Optional[float] = None) -> List[BaseTraceType]:
     sphere_x, sphere_y, sphere_z = get_sphere_points(n)
     points = np.stack((sphere_x, sphere_y, sphere_z), axis=-1)
 
@@ -226,33 +247,94 @@ def plot_regions(center: np.ndarray, vectors: List[np.ndarray], colors: List[str
         mask = np.array(region_indices) == i
         filtered_points = points[mask]
 
-        prev_h = hemispheres[(i - 1) % len(hemispheres)]
-        next_h = hemispheres[(i + 1) % len(hemispheres)]
-
-        first_border_v = next(iter(set(h).symmetric_difference(set(prev_h))))
-        first_sign = -1 if first_border_v in prev_h else 1
-        last_border_v = next(iter(set(next_h).symmetric_difference(set(h))))
-        last_sign = -1 if last_border_v in h else 1
-        for border_v, sign in zip([first_border_v, last_border_v], [first_sign, last_sign]):
-            normal2 = sign * normalize(np.cross(vectors[border_v], normal))
+        borders = get_border_normals(i, hemispheres, vectors)
+        for (_, border_normal) in borders:
             theta = np.linspace(0, np.pi, 100)
-            half_circle = (np.outer(np.cos(theta), normal) + np.outer(np.sin(theta), normal2))
+            half_circle = (np.outer(np.cos(theta), normal) + np.outer(np.sin(theta), border_normal))
             filtered_points = np.vstack([filtered_points, half_circle])
 
-        hull_center = np.mean(filtered_points, axis=0)
-        hull_points = np.vstack([filtered_points, -hull_center])
-        center_idx = len(hull_points) - 1
-
-        hull = ConvexHull(hull_points)
-        simplices = get_oriented_simplices(hull)
-        surface_simplices = simplices[~np.any(simplices == center_idx, axis=1)]
+        surface_simplices = get_surface_simplices(filtered_points)
         mesh = go.Mesh3d(x=filtered_points[:, 0] + center[0],
                          y=filtered_points[:, 1] + center[1],
                          z=filtered_points[:, 2] + center[2],
                          i=surface_simplices[:, 0], j=surface_simplices[:, 1], k=surface_simplices[:, 2],
-                         color=hemisphere_colors[i])
+                         color=rgb_to_str(hemisphere_colors[i], alpha), name=str(h))
         result.append(mesh)
     return result
+
+
+def get_border_normals(hemisphere_idx: int, hemispheres: List[Tuple[int, ...]],
+                       vectors: List[np.ndarray]) -> List[Tuple[np.ndarray, np.ndarray]]:
+    prev_h = hemispheres[(hemisphere_idx - 1) % len(hemispheres)]
+    next_h = hemispheres[(hemisphere_idx + 1) % len(hemispheres)]
+
+    h = hemispheres[hemisphere_idx]
+    first_border_v = next(iter(set(h).symmetric_difference(set(prev_h))))
+    last_border_v = next(iter(set(next_h).symmetric_difference(set(h))))
+
+    first_sign = -1 if first_border_v in prev_h else 1
+    last_sign = -1 if last_border_v in h else 1
+
+    normal = normalize(np.cross(vectors[0], vectors[1]))
+    first_vector = first_sign * vectors[first_border_v]
+    last_vector = last_sign * vectors[last_border_v]
+    first_normal = normalize(np.cross(first_vector, normal))
+    last_normal = normalize(np.cross(last_vector, normal))
+    return [(first_vector, first_normal), (last_vector, last_normal)]
+
+
+def get_arc_points(p1: np.ndarray, p2: np.ndarray) -> np.ndarray:
+    if np.linalg.norm(p1 - p2) < 1e-4:
+        return np.vstack([p1, (p1 + p2) / 2, p2])
+
+
+def plot_18regions(center: np.ndarray, vectors1: List[np.ndarray], colors1: List[str],
+                   vectors2: List[np.ndarray], colors2: List[str],
+                   n: int = 5000) -> List[BaseTraceType]:
+    sphere_x, sphere_y, sphere_z = get_sphere_points(n)
+    points = np.stack((sphere_x, sphere_y, sphere_z), axis=-1)
+
+    hemispheres = [(0,), (0, 1), (1,), (1, 2), (2,), (0, 2)]
+    hemisphere_colors1 = [get_region_color(h, colors1) for h in hemispheres]
+    hemisphere_colors2 = [get_region_color(h, colors2) for h in hemispheres]
+    region_indices1 = [hemispheres.index(get_hemisphere_indices(p, vectors1)) for p in points]
+    region_indices2 = [hemispheres.index(get_hemisphere_indices(p, vectors2)) for p in points]
+
+    normal = normalize(np.cross(vectors1[0], vectors1[1]))
+
+    result = []
+    for i, h in enumerate(hemispheres):
+        mask = np.array(region_indices1) == i
+        if 2 in h:
+            hemispheres2 = [(1,), (0, 1), (0,)]
+        else:
+            hemispheres2 = [(1, 2), (2,), (0, 2)]
+
+        h_idx = [hemispheres.index(hh) for hh in hemispheres2]
+        for j in h_idx:
+            mask2 = np.array(region_indices2) == j
+            filtered_points = points[mask & mask2]
+            if len(filtered_points) < 4:
+                continue
+
+            surface_simplices = get_surface_simplices(filtered_points)
+            region_color = mix_color_uniform([hemisphere_colors1[i], hemisphere_colors2[j]])
+            mesh = go.Mesh3d(x=filtered_points[:, 0] + center[0],
+                             y=filtered_points[:, 1] + center[1],
+                             z=filtered_points[:, 2] + center[2],
+                             i=surface_simplices[:, 0], j=surface_simplices[:, 1], k=surface_simplices[:, 2],
+                             color=rgb_to_str(region_color), name=f"{h} {hemispheres[j]}")
+            result.append(mesh)
+
+    return result
+
+
+def get_surface_simplices(filtered_points: np.ndarray) -> np.ndarray:
+    hull_center = np.mean(filtered_points, axis=0)
+    hull_points = np.vstack([filtered_points, -hull_center])
+    center_idx = len(hull_points) - 1
+    simplices = get_oriented_simplices(ConvexHull(hull_points))
+    return simplices[~np.any(simplices == center_idx, axis=1)]
 
 
 def get_sphere_points(n: int = 50) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:

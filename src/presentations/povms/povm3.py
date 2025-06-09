@@ -23,10 +23,11 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     angles = get_angles(povm)
     labels = get_labels(povm)
-    # colors = [get_color("D3", i) for i in range(len(povm.vectors))]
-    colors = [get_color("D3", 0),
-              get_color("D3", 3),
-              get_color("D3", 2)]
+    color_sequence = "D3"
+    # colors = [get_color(color_sequence, i) for i in range(len(povm.vectors))]
+    colors = [get_color(color_sequence, 0),
+              get_color(color_sequence, 3),
+              get_color(color_sequence, 2)]
     vectors = list(zip(angles, labels, colors))
 
     vector_traces, label_traces = plot_povm_vectors(slide_builder, vectors, radius)
