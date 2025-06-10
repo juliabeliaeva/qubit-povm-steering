@@ -67,7 +67,7 @@ def on_key(e: dict, n_keydowns: int, current_slide: int) -> int:
     if not e or "key" not in e:
         return current_slide
     if e["key"] == "ArrowRight" or e["key"] == " ":
-        return min(current_slide + 1, max_slides)
+        return min(current_slide + 1, max_slides - 1)
     elif e["key"] == "ArrowLeft":
         return max(current_slide - 1, 0)
     return current_slide
