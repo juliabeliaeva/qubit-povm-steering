@@ -18,7 +18,7 @@ We know how to simulate 3-outcome POVMs!
 <!--responsepm-->
 Coarse-grained POVMs $\{\Pi^{\pm}_{A_\pm}\}$:
 $$\begin{array}{l}
-\Pi^{\pm}_{A_\pm} = \int_S d\hat{\lambda} \prod_{a \in A_{\pm}}\Theta(\hat{x}\cdot\hat{\lambda})\prod_{a \notin A_{\pm}}(1 - \Theta(\hat{x}\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}\\
+\Pi^{\pm}_{A_\pm} = \int_S d\hat{\lambda} \prod_{a \in A_{\pm}}\Theta(\hat{x}_a\cdot\hat{\lambda})\prod_{a \notin A_{\pm}}(1 - \Theta(\hat{x}_a\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}\\
 A_{\pm} \subset O_\pm\text{, where }O_+ =\{5^+, 1, 2\}\text{, }O_+ =\{5^-, 3, 4\}
 \end{array}$$
 
@@ -37,3 +37,20 @@ Response function $p_-(a|A_-)$ for $\operatorname{POVM}_-$:
 | $\frac{1}{k_-}M_{5^-}^{r=\frac{1}{2}}$ |                            |   $\frac{2}{k_-}\mu_5$   |   $\frac{2}{k_-}\mu_5$   |                 |                 | $\frac{2}{k_-}\mu_5$ |
 |   $\frac{1}{k_-}M_3^{r=\frac{1}{2}}$   | $\frac{2}{k_-}\mu_3 - X_-$ |                          | $1 - \frac{2}{k_-}\mu_5$ |                 |       $1$       |        $Y_-$         |
 |   $\frac{1}{k_-}M_4^{r=\frac{1}{2}}$   | $\frac{2}{k_-}\mu_4 - Y_-$ | $1 - \frac{2}{k_-}\mu_5$ |                          |       $1$       |                 |        $X_-$         |
+<!--18regions-->
+$$\Pi_{A} = \int_S d\hat{\lambda} \prod_{a \in A}\Theta(\hat{x}_a\cdot\hat{\lambda})\prod_{a \notin A}(1 - \Theta(\hat{x}_a\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}$$
+
+where $A$ is one of 18 regions
+<!--18regionssim-->
+Let's simulate $M_1^{r=\frac{1}{2}}$:
+<!--18regionssim2-->
+We can simulate it using $\operatorname{POVM}_+$:
+$$\begin{multline}M_1^{r=\frac{1}{2}} = k_+ (\frac{2}{k_+}\mu_1 - X_+) \Pi^+_{\{1,2\}} + \\ + (1 - \frac{2}{k_+}\mu_5)) \Pi^+_{\{1,5^+\}} + \Pi^+_{\{1\}} + Y_+ \Pi^+_{\{5^+\}})\end{multline}$$
+<!--18regionssim3-->
+And then express $\operatorname{POVM}_+$ using $\Pi_{A}$:
+$$\begin{aligned}
+\Pi^+_{\{1,2\}} &=  \Pi_{\{1,2,5−\}} + \Pi_{\{1,2,3,5−\}} + \Pi_{\{1,2,4,5−\}} \\
+\Pi^+_{\{1,5^+\}} &= \Pi_{\{1,3,5+\}} + \Pi_{\{1,4,5+\}} + \Pi_{\{1,3,4,5+\}}\\
+\Pi^+_{\{1\}} &= \Pi_{\{1,5−\}} + \Pi_{\{1,4,5−\}} + \Pi_{\{1,3,5−\}}\\
+\Pi^+_{\{5^+\}} &= \Pi_{\{4,5+\}} + \Pi_{\{3,5+\}} + \Pi_{\{3,4,5+\}}
+\end{aligned}$$

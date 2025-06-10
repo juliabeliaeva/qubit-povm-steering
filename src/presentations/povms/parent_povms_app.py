@@ -8,7 +8,8 @@ from dash_extensions import Keyboard
 
 from povms import get_povm3, get_pvm, get_sample_povm4
 from presentations.povms.povm3 import plot_flat_povm, plot_flat_povm_proof
-from presentations.povms.povm4 import plot_povm4_plus_minus_regions, plot_povm4, plot_povm3_response
+from presentations.povms.povm4 import plot_povm4_plus_minus_regions, plot_povm4, plot_povm3_response, \
+    plot_povm4_response
 from presentations.povms.pvm import plot_pvm
 from presentations.povms.slides import AbstractSlideBuilder, TitleSlideBuilder
 
@@ -31,7 +32,8 @@ slides: List[AbstractSlideBuilder] = [TitleSlideBuilder(title, 1),
                                       TitleSlideBuilder("Parent POVM for 4-Outcome Measurements", level=2),
                                       plot_povm4(povm4),
                                       plot_povm3_response(),
-                                      plot_povm4_plus_minus_regions(povm4)]
+                                      plot_povm4_plus_minus_regions(povm4),
+                                      plot_povm4_response(povm4)]
 max_slides = sum([s.n_steps for s in slides])
 
 
