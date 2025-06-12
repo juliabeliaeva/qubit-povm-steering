@@ -178,14 +178,15 @@ def plot_povm4_response(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
     vectors_minus = [povm.vectors[2], povm.vectors[3], -x5]
 
     regions = get_18_regions(vectors_plus, region_colors_plus, vectors_minus, region_color_minus, 5000)
-    region_traces = plot_regions(regions, np.zeros(3), label_prefix=r"\Pi")
+    region_traces = plot_regions(regions, np.zeros(3), show_labels=True)
     region_traces = slide_builder.add_traces(region_traces)
     slide_builder.add_line(povm4_text['18regions'])
 
     slide_builder.next_step()
-    slide_builder.add_line(povm4_text['18regionssim'])
+    sim1 = slide_builder.add_line(povm4_text['18regionssim'])
 
     slide_builder.next_step()
+    slide_builder.hide_line(sim1)
     slide_builder.add_line(povm4_text['18regionssim2'])
 
     slide_builder.hide_traces(region_traces)
@@ -193,7 +194,7 @@ def plot_povm4_response(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
     filtered_six_regions = [r for r in six_regions if
                             r.h_idx[0] == (0, 1) or r.h_idx[0] == (0, 2) or r.h_idx[0] == (0,) or r.h_idx[0] == (2,)]
     six_regions_traces = slide_builder.add_traces(plot_regions(filtered_six_regions, np.zeros(3),
-                                                               label_prefix=r"\Pi^+", d=1.2))
+                                                               show_labels=True, d=1.2))
 
     slide_builder.next_step()
     slide_builder.add_line(povm4_text['18regionssim3'])
@@ -201,10 +202,38 @@ def plot_povm4_response(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
 
     filtered_full_regions = [r for r in regions if
                              r.h_idx[0] == (0, 1) or r.h_idx[0] == (0, 2) or r.h_idx[0] == (0,) or r.h_idx[0] == (2,)]
-    full_regions_traces = slide_builder.add_traces(plot_regions(filtered_full_regions, np.zeros(3),
-                                                                label_prefix=r"\Pi"))
+    filtered_full_regions_traces = slide_builder.add_traces(plot_regions(filtered_full_regions, np.zeros(3),
+                                                                         show_labels=True))
+
+    slide_builder.next_step()
+    slide_builder.add_line(povm4_text['18regionssim4'])
+
+    slide_builder.next_step()
+    slide_builder.hide_all_lines()
+    slide_builder.hide_traces(filtered_full_regions_traces)
+
+    filtered_full_regions = [r for r in regions if
+                             r.h_idx[0] == (0, 1) or r.h_idx[1] == (1, 2)]
+    filtered_full_regions_traces = slide_builder.add_traces(plot_regions(filtered_full_regions, np.zeros(3),
+                                                                         show_labels=True))
+
+    slide_builder.add_line(povm4_text['18regionssimall'])
+
+    slide_builder.next_step()
+    norm_line = slide_builder.add_line(povm4_text['18regionsnorm1'])
+
+    slide_builder.next_step()
+    slide_builder.hide_line(norm_line)
+    norm_line = slide_builder.add_line(povm4_text['18regionsnorm2'])
+
+    slide_builder.next_step()
+    slide_builder.hide_line(norm_line)
+    norm_line = slide_builder.add_line(povm4_text['18regionsnorm3'])
 
     update_layout(slide_builder)
+    eye_distance = 1.5
+    slide_builder.fig.update_layout(scene_camera=dict(eye=dict(x=eye_distance * 1, y=0,
+                                                               z=eye_distance * 1)))
 
     return slide_builder
 
@@ -413,7 +442,7 @@ def get_18_regions(vectors1: List[np.ndarray], colors1: List[str],
 
 
 def plot_regions(regions: List[Region], center: np.ndarray,
-                 label_prefix: Optional[str] = None, d: float = 1.12) -> List[BaseTraceType]:
+                 show_labels: bool = False, d: float = 1.12) -> List[BaseTraceType]:
     result = []
     for region in regions:
         name = " ".join([str(i) for i in region.h_idx])
@@ -422,19 +451,19 @@ def plot_regions(regions: List[Region], center: np.ndarray,
                          z=region.points[:, 2] + center[2],
                          i=region.simplices[:, 0], j=region.simplices[:, 1], k=region.simplices[:, 2],
                          color=region.color, name=name)
-        if label_prefix:
+        if show_labels:
             if len(region.corners) <= 2:
                 mean = np.mean(region.points, axis=0)
             else:
                 mean = np.mean(region.corners, axis=0)
             c = d * normalize(mean)
             if len(region.h_idx) == 1:
-                region_id = ",".join([str(h + 1) if h != 2 else "5+" for h in region.h_idx[0]])
+                region_id = ",".join([str(h + 1) if h != 2 else "5^+" for h in region.h_idx[0]])
             else:
-                h1_id = [str(h + 1) if h != 2 else "5+" for h in region.h_idx[0]]
-                h2_id = [str(h + 3) if h != 2 else "5-" for h in region.h_idx[1]]
+                h1_id = [str(h + 1) if h != 2 else "5^+" for h in region.h_idx[0]]
+                h2_id = [str(h + 3) if h != 2 else "5^-" for h in region.h_idx[1]]
                 region_id = ",".join([*h1_id, *h2_id])
-            latex_label = "$" + label_prefix + "_{" + region_id + "}$"
+            latex_label = "$" + region_id + "$"
             label = latex_to_html(latex_label)
             result.append(go.Scatter3d(x=[c[0]], y=[c[1]], z=[c[2]],
                                        mode='text', textfont=dict(size=30),
