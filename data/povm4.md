@@ -44,10 +44,10 @@ where $A$ is one of 18 regions
 <!--18regionssim-->
 Let's simulate $M_1^{r=\frac{1}{2}}$:
 <!--18regionssim2-->
-We can simulate it using $\operatorname{POVM}_+$:
+It was in $\operatorname{POVM}_+$, so we can simulate it using $\Pi^+$:
 $$\begin{multline}M_1^{r=\frac{1}{2}} = k_+ (\frac{2}{k_+}\mu_1 - X_+) \Pi^+_{\{1,2\}} + \\ + (1 - \frac{2}{k_+}\mu_5)) \Pi^+_{\{1,5^+\}} + \Pi^+_{\{1\}} + Y_+ \Pi^+_{\{5^+\}})\end{multline}$$
 <!--18regionssim3-->
-And then express $\operatorname{POVM}_+$ using $\Pi_{A}$:
+And then express $\Pi^+$ using $\Pi_{A}$:
 $$\begin{aligned}
 \Pi^+_{\{1,2\}} &=  \Pi_{\{1,2,5−\}} + \Pi_{\{1,2,3,5−\}} + \Pi_{\{1,2,4,5−\}} \\
 \Pi^+_{\{1,5^+\}} &= \Pi_{\{1,3,5+\}} + \Pi_{\{1,4,5+\}} + \Pi_{\{1,3,4,5+\}}\\

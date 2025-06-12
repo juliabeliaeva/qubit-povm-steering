@@ -29,7 +29,7 @@ $$\hat{\lambda}_1 = \frac{\hat{x}_2 + \hat{x}_3}{|\hat{x}_2 + \hat{x}_3|}\text{,
 <!--coarsesim-->
 Goal:
 
-$$\Pi_{\hat{\lambda}} \xrightarrow{\text{simulates}} \Pi_A \xrightarrow{\text{simulates ?}} M_a^{r=\frac{1}{2}}$$
+$$\Pi_{\hat{\lambda}} \xrightarrow{\text{simulates}} \Pi_A \xrightarrow{\text{simulates}} M_a^{r=\frac{1}{2}}$$
 <!--responceunnorm-->
 Original (unnormalized) response function:
 
@@ -47,9 +47,9 @@ Modified response function:
 | $M_2^{r=\frac{1}{2}}$ |  $2\mu_2 - X$   |                 |  $1 - 2\mu_1$   |               |      $1$      |      $Y$      |
 | $M_3^{r=\frac{1}{2}}$ |  $2\mu_3 - Y$   |  $1 - 2\mu_1$   |                 |      $1$      |               |      $X$      |
 
-This function is normalized if $2 \mu_1 + X + Y = 1$.
+We need $2 \mu_1 + X + Y = 1$, $X \le 2\mu_2$ and $Y \le 2\mu_3$.
 <!--simulates-->
-Can we simulate $M_a^{r=\frac{1}{2}}$ with the modified response function?
+Can we find such $X$ and $Y$ to simulate $M_a^{r=\frac{1}{2}}$?
 <!--coarsesimple-->
 Coarse-grained POVM:
 $$\begin{align}
