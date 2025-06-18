@@ -116,7 +116,7 @@ class SlideBuilder(AbstractSlideBuilder):
         if text:
             text_style = {"flex": "1", "padding": "1px", "overflow": "auto"}
             if not figure:
-                text_style = {**text_style, "paddingLeft": "40px"}
+                text_style = {**text_style, "paddingLeft": "100px", "paddingRight": "100px"}
                 class_name = "text-slide-text"
             else:
                 class_name = "figure-slide-text"
