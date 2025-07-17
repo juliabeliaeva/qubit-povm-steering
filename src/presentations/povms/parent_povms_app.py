@@ -13,7 +13,7 @@ from presentations.povms.povm4 import plot_povm4_plus_minus_regions, plot_povm4,
 from presentations.povms.pvm import plot_pvm
 from presentations.povms.slides import AbstractSlideBuilder, TitleSlideBuilder
 
-title = "Parent POVM Constructions"
+title = "Joint Measurability of Noisy Qubit POVMs"
 
 app = dash.Dash(__name__)
 app.title = title
@@ -28,7 +28,7 @@ slides: List[AbstractSlideBuilder] = [TitleSlideBuilder(title, 1),
                                       plot_pvm(pvm),
                                       TitleSlideBuilder("Parent POVM for 3-Outcome Measurements", level=2),
                                       plot_flat_povm(povm3),
-                                      plot_flat_povm_proof(),
+                                      TitleSlideBuilder("Yes", level=2),
                                       TitleSlideBuilder("Parent POVM for 4-Outcome Measurements", level=2),
                                       plot_povm4(povm4),
                                       plot_povm3_response(),

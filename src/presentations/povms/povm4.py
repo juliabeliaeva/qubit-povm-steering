@@ -140,10 +140,12 @@ def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
     traces_6regions = slide_builder.add_traces(regions_plus + regions_minus)
 
     circle_traces = []
-    for c, v in zip([center1] * 3 + [center2] * 3, vectors_plus + vectors_minus):
+    for i, (c, v) in enumerate(zip([center1] * 3 + [center2] * 3, vectors_plus + vectors_minus)):
         circle_x, circle_y, circle_z = get_circle_points(c, v, radius=1.0005, num_points=200)
+        width = 3 if i in {0, 1, 3, 4} else 7
         circle_traces.append(slide_builder.add_trace(go.Scatter3d(x=circle_x, y=circle_y, z=circle_z,
-                                                                  mode='lines', line={"width": 3, "color": "black"})))
+                                                                  mode='lines',
+                                                                  line={"width": width, "color": "black"})))
 
     slide_builder.next_step()
     slide_builder.hide_traces(vector_traces1 + vector_traces2)

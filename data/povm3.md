@@ -21,8 +21,11 @@ Let's fix $p(a|\{\hat{x}_a\},\hat{\lambda})$!
 <!--6regions-->
 6 regions: $A \in \{\{1\}, \{2\}, \{3\}, \{1, 2\}, \{2, 3\}, \{1, 3\}\}$
 <!--coarse-->
-Coarse-grained POVM:  
+Let's integrate $\lambda$ over each region $A$:  
 $$\Pi_A = \int_S d\hat{\lambda} \prod_{a \in A}\Theta(\hat{x}_a\cdot\hat{\lambda})\prod_{a' \notin A}(1 - \Theta(\hat{x}_{a'}\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}$$
+<!--coarse2-->
+Let's integrate $\lambda$ over each region $A$:  
+$$\Pi_A = \int_S d\hat{\lambda} \quad\text{"1 on the region A"}\quad \Pi_{\hat{\lambda}}$$
 <!--coarseexplicit-->
 $$\begin{align}\Pi_{\{1\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} - \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\\\Pi_{\{1\}^c}=\Pi_{\{2, 3\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} + \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\end{align}$$  
 $$\hat{\lambda}_1 = \frac{\hat{x}_2 + \hat{x}_3}{|\hat{x}_2 + \hat{x}_3|}\text{, } \theta_1 = \arccos{(-\hat{x}_2 \cdot \hat{x}_3)}\text{, }\theta_1 + \theta_2 + \theta_3 = \pi$$

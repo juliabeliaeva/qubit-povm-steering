@@ -6,7 +6,7 @@ $$M_{\pm} = \frac{1}{2}\left(\mathbb{I} \pm \hat{x} \cdot \vec{\sigma}\right) \x
 Noisy version:  
 $$M_{\pm}^{r=\frac{1}{2}} = \frac{1}{2}\left(\mathbb{I} \pm \frac{1}{2} \hat{x} \cdot \vec{\sigma}\right)$$
 <!--parentpvm-->
-Let's use this POVM as parent:  
+Parent POVM:  
 $$\Pi_{\hat{\lambda}} = \frac{1}{4\pi}\left(\mathbb{I} + \hat{\lambda} \cdot \vec{\sigma}\right)$$
 <!--response-->
 Response function:  

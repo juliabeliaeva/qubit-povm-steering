@@ -34,7 +34,7 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     # slide_builder.add_line(povm3_text['3outnoisy'])
 
     slide_builder.next_step()
-    slide_builder.add_line(povm3_text['parent'])
+    # slide_builder.add_line(povm3_text['parent'])
 
     line_angles = [2 * np.pi * i / num_lines for i in range(num_lines)]
     parent_traces = []
@@ -47,10 +47,6 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     slide_builder.next_step()
     slide_builder.add_line(povm3_text['simpleresponce'])
-    slide_builder.next_step()
-    slide_builder.add_line(povm3_text['simpleintegral'])
-    slide_builder.next_step()
-    slide_builder.add_line(povm3_text['simplenormalization'])
 
     slide_builder.next_step()
     slide_builder.hide_traces(label_traces)
@@ -61,6 +57,12 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     response_table_before = get_response_table_pvm(povm)
     traces_before = plot_response_function(slide_builder, povm, angles, colors, line_angles,
                                            response_table_before, radius)
+
+    slide_builder.next_step()
+
+    slide_builder.add_line(povm3_text['simpleintegral'])
+    slide_builder.next_step()
+    slide_builder.add_line(povm3_text['simplenormalization'])
 
     slide_builder.next_step()
     slide_builder.add_line(povm3_text['letsfix'])
@@ -83,7 +85,10 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     slide_builder.add_line(povm3_text['6regions'])
     slide_builder.next_step()
-    slide_builder.add_line(povm3_text['coarse'])
+    coarse1 = slide_builder.add_line(povm3_text['coarse'])
+    slide_builder.next_step()
+    slide_builder.hide_line(coarse1)
+    slide_builder.add_line(povm3_text['coarse2'])
     slide_builder.next_step()
 
     slide_builder.hide_traces(parent_traces)
