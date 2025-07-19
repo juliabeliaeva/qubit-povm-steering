@@ -39,11 +39,14 @@ max_slides = sum([s.n_steps for s in slides])
 
 def build_slide(step_idx: int) -> List[Component]:
     current_step_idx = step_idx
-    for current_slide in slides:
+    for slide_idx, current_slide in enumerate(slides):
         if current_slide.n_steps > current_step_idx:
-            return current_slide.build_components(current_step_idx)
+            return current_slide.build_components(slide_idx, current_step_idx)
         current_step_idx -= current_slide.n_steps
-    return slides[-1].build_components(slides[-1].n_steps - 1)
+
+    last_slide = len(slides) - 1
+    last_step = slides[-1].n_steps - 1
+    return slides[-1].build_components(last_slide, last_step)
 
 
 app.layout = html.Div([

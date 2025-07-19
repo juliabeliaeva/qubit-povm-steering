@@ -15,7 +15,7 @@ class AbstractSlideBuilder(ABC):
         ...
 
     @abstractmethod
-    def build_components(self, step: int) -> List[Component]:
+    def build_components(self, slide: int, step: int) -> List[Component]:
         ...
 
 
@@ -27,15 +27,18 @@ class SlideBuilder(AbstractSlideBuilder):
         self.visible_lines: Dict[int, Set[int]] = defaultdict(set)
         self.fig = go.Figure()
         self.lines: List[str] = []
+        self.line_classes: Dict[int, str] = {}
 
     @property
     def n_steps(self) -> int:
         return max([*self.visible_traces.keys(), *self.visible_lines.keys()]) + 1
 
-    def add_line(self, line: str) -> int:
+    def add_line(self, line: str, line_class: Optional[str] = None) -> int:
         self.lines.append(line)
         line_id = len(self.lines) - 1
         self.visible_lines[self.current_step].add(line_id)
+        if line_class:
+            self.line_classes[line_id] = line_class
         return line_id
 
     def add_trace(self, trace: BaseTraceType) -> int:
@@ -86,7 +89,7 @@ class SlideBuilder(AbstractSlideBuilder):
         for trace_idx in trace_indices:
             self.visible_traces[self.current_step].add(trace_idx)
 
-    def build(self, step: int) -> Tuple[Optional[go.Figure], str]:
+    def build(self, step: int) -> Tuple[Optional[go.Figure], str, str]:
         visible_traces = self.visible_traces[step]
         for i, trace in enumerate(self.fig.data):
             trace.visible = i in visible_traces
@@ -94,15 +97,18 @@ class SlideBuilder(AbstractSlideBuilder):
         visible_lines = self.visible_lines[step]
         text = "\n\n".join([line for i, line in enumerate(self.lines) if i in visible_lines])
 
+        classes = [self.line_classes[line_id] for line_id in visible_lines if line_id in self.line_classes]
+        class_name = " ".join(classes)
+
         if not self.fig.data:
-            return None, text
+            return None, text, class_name
 
-        return self.fig, text
+        return self.fig, text, class_name
 
-    def build_components(self, step: int) -> List[Component]:
+    def build_components(self, slide: int, step: int) -> List[Component]:
         title = dcc.Markdown(f"## {self.title}", mathjax=True, className="slide-title",
                              style={"textAlign": "center", "width": "100%"}) if self.title else None
-        figure, text = self.build(step)
+        figure, text, md_class_name = self.build(step)
 
         content = []
         if figure:
@@ -120,7 +126,8 @@ class SlideBuilder(AbstractSlideBuilder):
                 class_name = "text-slide-text"
             else:
                 class_name = "figure-slide-text"
-            content.append(html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True)),
+            content.append(html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True,
+                                                           className=f"md-{slide}-{step} {md_class_name}")),
                                     className=class_name, style=text_style))
 
         row = html.Div(content, style={"display": "flex", "flexDirection": "row", "flex": "1", "width": "100%"})
@@ -139,7 +146,7 @@ class TitleSlideBuilder(AbstractSlideBuilder):
     def n_steps(self):
         return 1
 
-    def build_components(self, step: int) -> List[Component]:
+    def build_components(self, slide: int, step: int) -> List[Component]:
         heading_constructor = [html.H1, html.H2, html.H3, html.H4, html.H5, html.H6][self.level - 1]
         heading = heading_constructor(self.title,
                                       style={'textAlign': "center", 'fontFamily': "'Lato', sans-serif"})
