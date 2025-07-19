@@ -9,7 +9,7 @@ from scipy.spatial import ConvexHull
 
 from crossections import make_orthogonal
 from latex_util import latex_to_html
-from plotly_utils import get_color, parse_rgb, mix_color_uniform, rgb_to_str
+from plotly_utils import get_color, parse_rgb, mix_color_uniform, rgb_to_str, apply_orthographic_zoom
 from povms import QubitPovm, plot_sphere
 from presentations.povms.povms_common import read_md
 from presentations.povms.slides import SlideBuilder
@@ -91,16 +91,14 @@ def get_polygon_mesh(x: np.ndarray, y: np.ndarray, z: np.ndarray, color: str,
 
 
 def update_layout(slide_builder: SlideBuilder):
-    eye_distance = 1.2
     slide_builder.fig.update_layout(scene=dict(xaxis=dict(visible=False),
                                                yaxis=dict(visible=False),
-                                               zaxis=dict(visible=False),
-                                               aspectmode="data"),
-                                    scene_camera=dict(eye=dict(x=eye_distance * 1, y=0,
-                                                               z=eye_distance * 1)),
+                                               zaxis=dict(visible=False)),
+                                    scene_camera=dict(eye=dict(x=1, y=0, z=1)),
                                     font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif"),
                                     margin=dict(l=0, r=0, t=0, b=0),
                                     plot_bgcolor='white', title=None, showlegend=False)
+    apply_orthographic_zoom(slide_builder.fig, zoom=2)
 
 
 def plot_povm3_response() -> SlideBuilder:
