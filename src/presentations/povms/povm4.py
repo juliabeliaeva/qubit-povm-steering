@@ -4,6 +4,7 @@ from typing import Tuple, List, Optional
 
 import numpy as np
 import plotly.graph_objects as go
+from numpy.ma.core import zeros_like
 from plotly.basedatatypes import BaseTraceType
 from scipy.spatial import ConvexHull
 
@@ -128,45 +129,79 @@ def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
                                   radius=radius)
     vector_traces2 = plot_vectors(slide_builder, vectors_minus, colors_minus, labels_minus, center=center2,
                                   radius=radius)
+    label_height = 1.5 * radius
+    label_depth = 0.3 * radius
+    label_traces = plot_plot_labels(slide_builder, [center1, center2], ["$POVM_+$", "$POVM_-$"],
+                                    label_height, label_depth)
 
     slide_builder.next_step()
+
+    slide_builder.hide_traces(label_traces)
+
+    x5_axes_traces = []
+    for x, center in zip([x5, -x5], [center1, center2]):
+        d = 1.3
+        t = slide_builder.add_trace(go.Scatter3d(x=[-d * radius * x[0] + center[0], d * radius * x[0] + center[0]],
+                                                 y=[-d * radius * x[1] + center[1], d * radius * x[1] + center[1]],
+                                                 z=[-d * radius * x[2] + center[2], d * radius * x[2] + center[2]],
+                                                 mode='lines',
+                                                 line=dict(width=2, color='black')))
+        x5_axes_traces.append(t)
+
+    label_traces = plot_plot_labels(slide_builder, [center1, center2], ["$\\Pi^+_{A_+}$", "$\\Pi^-_{A_-}$"],
+                                    label_height, label_depth)
+
     slide_builder.hide_trace(sphere_trace1)
     slide_builder.hide_trace(sphere_trace2)
 
-    regions_plus = plot_6regions(center1, vectors_plus, region_colors_plus, alpha=0.5)
-    regions_minus = plot_6regions(center2, vectors_minus, region_color_minus, alpha=0.5)
-    traces_6regions = slide_builder.add_traces(regions_plus + regions_minus)
-
     circle_traces = []
-    for i, (c, v) in enumerate(zip([center1] * 3 + [center2] * 3, vectors_plus + vectors_minus)):
+    for i, (c, v) in enumerate(zip([center1, center2], [x5, -x5])):
         circle_x, circle_y, circle_z = get_circle_points(c, v, radius=1.0005, num_points=200)
-        width = 3 if i in {0, 1, 3, 4} else 7
+        width = 7
         circle_traces.append(slide_builder.add_trace(go.Scatter3d(x=circle_x, y=circle_y, z=circle_z,
                                                                   mode='lines',
                                                                   line={"width": width, "color": "black"})))
 
-    slide_builder.next_step()
     slide_builder.hide_traces(vector_traces1 + vector_traces2)
-    slide_builder.hide_traces(traces_6regions + circle_traces)
 
     regions_plus = plot_6regions(center1, vectors_plus, region_colors_plus)
     regions_minus = plot_6regions(center2, vectors_minus, region_color_minus)
     traces_6regions = slide_builder.add_traces(regions_plus + regions_minus)
 
     slide_builder.next_step()
-    slide_builder.hide_traces(traces_6regions)
+    slide_builder.hide_traces(traces_6regions + x5_axes_traces + circle_traces + label_traces)
 
-    regions_plus2 = plot_6regions(np.array([0, -2.3 * radius, 0]), vectors_plus,
+    new_center1 = np.array([0, -2.3 * radius, 0])
+    regions_plus2 = plot_6regions(new_center1, vectors_plus,
                                   region_colors_plus)
-    regions_minus2 = plot_6regions(np.array([0, 2.3 * radius, 0]), vectors_minus, region_color_minus)
+    new_center2 = np.array([0, 2.3 * radius, 0])
+    regions_minus2 = plot_6regions(new_center2, vectors_minus, region_color_minus)
+
     slide_builder.add_traces(regions_plus2 + regions_minus2)
     slide_builder.add_traces(plot_18regions(np.array([0, 0, 0]),
                                             vectors_plus, region_colors_plus,
                                             vectors_minus, region_color_minus))
 
+    plot_plot_labels(slide_builder, [new_center1, new_center2, zeros_like(new_center1)],
+                     ["$\\Pi^+_{A_+}$", "$\\Pi^-_{A_-}$", "$\\Pi_{A = A_+ ∩ A_-}$"],
+                     label_height, label_depth)
+
     update_layout(slide_builder)
 
     return slide_builder
+
+
+def plot_plot_labels(slide_builder: SlideBuilder, centers: List[np.ndarray], plot_labels: List[str],
+                     label_height: float, label_depth: float) -> List[int]:
+    label_traces = []
+    for center, label in zip(centers, plot_labels):
+        t = slide_builder.add_trace(go.Scatter3d(x=[center[0] - label_depth],
+                                                 y=[center[1]],
+                                                 z=[label_height + center[2]],
+                                                 mode='text', textfont=dict(size=30),
+                                                 text=[latex_to_html(label)], textposition='middle center'))
+        label_traces.append(t)
+    return label_traces
 
 
 def plot_povm4_response(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
