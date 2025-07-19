@@ -59,17 +59,18 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
                                            response_table_before, radius)
 
     slide_builder.next_step()
-
-    slide_builder.add_line(povm3_text['simpleintegral'])
-    slide_builder.next_step()
     slide_builder.add_line(povm3_text['simplenormalization'])
-
+    slide_builder.next_step()
+    slide_builder.add_line(povm3_text['simpleintegral'])
     slide_builder.next_step()
     slide_builder.add_line(povm3_text['letsfix'])
 
     slide_builder.next_step()
     slide_builder.hide_all_lines()
     slide_builder.hide_traces(traces_before)
+
+    slide_builder.add_line(povm3_text['coarsesim'])
+    slide_builder.next_step()
 
     sector_angles = get_sector_angles(angles)
     sector_traces = []
@@ -125,18 +126,16 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
         coarse_labels.append(trace_lambda)
 
     slide_builder.next_step()
-    slide_builder.add_line(povm3_text['coarsesim'])
-    slide_builder.next_step()
     slide_builder.hide_traces(coarse_labels)
     slide_builder.hide_all_lines()
-    slide_builder.add_line(povm3_text['responceunnorm'])
+    slide_builder.add_line(povm3_text['responceunnorm'], 'responceunnorm')
 
     traces_before2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
                                             response_table_before, radius)
     slide_builder.next_step()
-    slide_builder.add_line(povm3_text['responcenorm'])
+    slide_builder.hide_all_lines()
+    slide_builder.add_line(povm3_text['responcenorm'], 'responcenorm')
 
-    slide_builder.next_step()
     slide_builder.hide_traces(traces_before2)
     response_table_after = get_response_table(povm)
     traces_after2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,

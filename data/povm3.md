@@ -8,31 +8,30 @@ Let's use the same parent POVM:
 $$\Pi_{\hat{\lambda}} = \frac{1}{4\pi}\left(\mathbb{I} + \hat{\lambda} \cdot \vec{\sigma}\right)$$
 <!--simpleresponce-->
 Does a similar response function work?
-
 $$p(a|\{\hat{x}_a\},\hat{\lambda}) = 2\mu_a \Theta(\hat{x}_a\cdot\hat{\lambda})$$
 <!--simpleintegral-->
-We can simulate $M_a^{r=\frac{1}{2}}$:
+But we can simulate $M_a^{r=\frac{1}{2}}$:
 $$\begin{align}\int_S d\hat{\lambda} p(a|\{\hat{x}_a\},\hat{\lambda}) \Pi_{\hat{\lambda}} &= 2\mu_a\frac{1}{4\pi} \int_{\hat{x}_a\cdot\hat{\lambda} >0} d\hat{\lambda} (\mathbb{I} + \hat{\lambda} \cdot \vec{\sigma}) =\\&= 2\mu_a\frac{1}{2}\left(\mathbb{I} + \frac{1}{2} \hat{x}_a \cdot \vec{\sigma}\right) = M_a^{r=\frac{1}{2}}\end{align}$$
 <!--simplenormalization-->
-But it's not normalized:  
+This response function is not normalized:  
 $$\sum_a p(a|\{\hat{x}_a\},\hat{\lambda}) \neq 1$$
 <!--letsfix-->
 Let's fix $p(a|\{\hat{x}_a\},\hat{\lambda})$!
 <!--6regions-->
 6 regions: $A \in \{\{1\}, \{2\}, \{3\}, \{1, 2\}, \{2, 3\}, \{1, 3\}\}$
 <!--coarse-->
-Let's integrate $\lambda$ over each region $A$:  
+Integrate $\hat{\lambda}$ over each region $A$:  
 $$\Pi_A = \int_S d\hat{\lambda} \prod_{a \in A}\Theta(\hat{x}_a\cdot\hat{\lambda})\prod_{a' \notin A}(1 - \Theta(\hat{x}_{a'}\cdot\hat{\lambda})) \Pi_{\hat{\lambda}}$$
 <!--coarse2-->
-Let's integrate $\lambda$ over each region $A$:  
+Integrate $\hat{\lambda}$ over each region $A$:  
 $$\Pi_A = \int_S d\hat{\lambda} \quad\text{"1 on the region A"}\quad \Pi_{\hat{\lambda}}$$
 <!--coarseexplicit-->
 $$\begin{align}\Pi_{\{1\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} - \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\\\Pi_{\{1\}^c}=\Pi_{\{2, 3\}} &= \frac{\theta_1}{2\pi}(\mathbb{I} + \frac{\pi \sin{\frac{\theta_1}{2}}}{2 \theta_1}\hat{\lambda}_1 \cdot \vec{\sigma})\end{align}$$  
 $$\hat{\lambda}_1 = \frac{\hat{x}_2 + \hat{x}_3}{|\hat{x}_2 + \hat{x}_3|}\text{, } \theta_1 = \arccos{(-\hat{x}_2 \cdot \hat{x}_3)}\text{, }\theta_1 + \theta_2 + \theta_3 = \pi$$
 <!--coarsesim-->
-Goal:
+Coarse-grained POVM:
 
-$$\Pi_{\hat{\lambda}} \xrightarrow{\text{simulates}} \Pi_A \xrightarrow{\text{simulates}} M_a^{r=\frac{1}{2}}$$
+$$\underbrace{\Pi_{\hat{\lambda}}}_{\substack{\text{parent POVM}\\\text{infinite}}} \xrightarrow{\text{simulates}} \underbrace{\Pi_A}_{\substack{\text{coarse-grained POVM}\\\text{finite}}} \xrightarrow{\text{simulates}} \underbrace{M_a^{r=\frac{1}{2}}}_{\text{target}}$$
 <!--responceunnorm-->
 Original (unnormalized) response function:
 
