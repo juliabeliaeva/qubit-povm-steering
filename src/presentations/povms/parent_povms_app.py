@@ -54,7 +54,7 @@ app.layout = html.Div([
     html.Link(href="https://fonts.googleapis.com/css2?family=Lato&display=swap", rel="stylesheet"),
     html.Link(href="https://fonts.googleapis.com/css2?family=STIX+Two+Math&display=swap", rel="stylesheet"),
     dcc.Store(id="slide-index", data=0),
-    Keyboard(id="keyboard", captureKeys=["ArrowRight", "ArrowLeft", " "]),
+    Keyboard(id="keyboard", captureKeys=["ArrowRight", "ArrowLeft", " ", "Home", "End"]),
     html.Div(id='slide-content', children=[],
              style={"display": "flex", "height": "100vh", "width": "100%",
                     "flexDirection": "column", "alignItems": "center"}),
@@ -70,10 +70,15 @@ app.layout = html.Div([
 def on_key(e: dict, n_keydowns: int, current_slide: int) -> int:
     if not e or "key" not in e:
         return current_slide
-    if e["key"] == "ArrowRight" or e["key"] == " ":
+    key = e["key"]
+    if key == "ArrowRight" or key == " ":
         return min(current_slide + 1, max_slides - 1)
-    elif e["key"] == "ArrowLeft":
+    elif key == "ArrowLeft":
         return max(current_slide - 1, 0)
+    elif key == "Home":
+        return 0
+    elif key == "End":
+        return max_slides - 1
     return current_slide
 
 
