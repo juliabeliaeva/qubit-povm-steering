@@ -136,13 +136,27 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder.hide_all_lines()
     slide_builder.add_line(povm3_text['responcenorm'], 'responcenorm')
 
-    slide_builder.hide_traces(traces_before2)
-    response_table_after = get_response_table(povm)
-    traces_after2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
-                                           response_table_after, radius)
+    response_traces = traces_before2
+    xy_line = None
+    scales = [1, 0, 0.33, 0.66, 1]
+    for i, scale in enumerate(scales):
+        slide_builder.hide_traces(response_traces)
+        if xy_line is not None:
+            slide_builder.hide_line(xy_line)
 
-    slide_builder.next_step()
-    slide_builder.add_line(povm3_text['simulates'])
+        x, y = get_x_y(povm, scale)
+        response_table_after = get_response_table(povm, x, y)
+        response_traces = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
+                                                 response_table_after, radius)
+        if i == 0:
+            slide_builder.next_step()
+            slide_builder.add_line(povm3_text['simulates'])
+            slide_builder.next_step()
+        elif i != len(scales) - 1:
+            xy_line = slide_builder.add_line(f"$X = {x:.2f}, Y = {y:.2f}$")
+            slide_builder.next_step()
+        else:
+            xy_line = slide_builder.add_line(povm3_text['simulatesanswer'])
 
     update_layout(slide_builder.fig)
 
@@ -203,16 +217,9 @@ def plot_flat_povm_proof() -> SlideBuilder:
     return slide_builder
 
 
-def get_response_table(povm: QubitPovm) -> Dict[Tuple[int, Tuple], float]:
+def get_response_table(povm: QubitPovm, x: float, y: float) -> Dict[Tuple[int, Tuple], float]:
     result = get_response_table_pvm(povm)
 
-    thetas = np.array([(math.acos(-np.inner(povm.vectors[1], povm.vectors[2]))),
-                       math.acos(-np.inner(povm.vectors[0], povm.vectors[2])),
-                       math.acos(-np.inner(povm.vectors[0], povm.vectors[1]))])
-
-    x = ((thetas[0] * (1 - 2 * povm.mus[0]) - thetas[1] * (1 - 2 * povm.mus[1]) + thetas[2] * (1 - 2 * povm.mus[2])) /
-         (2 * thetas[0]))
-    y = 1 - 2 * povm.mus[0] - x
     result[(1, (0,))] = y
     result[(2, (0,))] = x
     result[(1, (1,))] = 1
@@ -223,6 +230,17 @@ def get_response_table(povm: QubitPovm) -> Dict[Tuple[int, Tuple], float]:
     result[(2, (0, 2))] = 1 - result[(0, (0, 2))]
 
     return result
+
+
+def get_x_y(povm: QubitPovm, scale: float = 1) -> Tuple[float, float]:
+    thetas = np.array([(math.acos(-np.inner(povm.vectors[1], povm.vectors[2]))),
+                       math.acos(-np.inner(povm.vectors[0], povm.vectors[2])),
+                       math.acos(-np.inner(povm.vectors[0], povm.vectors[1]))])
+    x = scale * ((thetas[0] * (1 - 2 * povm.mus[0]) - thetas[1] * (1 - 2 * povm.mus[1]) + thetas[2] * (
+            1 - 2 * povm.mus[2])) /
+                 (2 * thetas[0]))
+    y = 1 - 2 * povm.mus[0] - x
+    return x, y
 
 
 def get_sector_angles(angles):

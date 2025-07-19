@@ -52,6 +52,9 @@ Modified response function:
 We need $2 \mu_1 + X + Y = 1$, $X \le 2\mu_2$ and $Y \le 2\mu_3$.
 <!--simulates-->
 Can we find such $X$ and $Y$ to simulate $M_a^{r=\frac{1}{2}}$?
+<!--simulatesanswer-->
+$$X = \frac{\theta_1(1-2\mu_1) - \theta_2(1-2\mu_2) + \theta_3(1-2\mu_3)}{2\theta_1}$$
+$$Y = \frac{\theta_1(1-2\mu_1) + \theta_2(1-2\mu_2) - \theta_3(1-2\mu_3)}{2\theta_1}$$
 <!--coarsesimple-->
 Coarse-grained POVM:
 $$\begin{align}
