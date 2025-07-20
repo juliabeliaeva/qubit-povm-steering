@@ -304,7 +304,7 @@ def plot_povm4_response_diagram() -> SlideBuilder:
 
 
 def plot_povm4_normalization(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
-    slide_builder = SlideBuilder("Normalization for response function of 18-Outcome POVM")
+    slide_builder = SlideBuilder("Response function for 18-Outcome POVM")
 
     center1 = np.array([0, -1.5 * radius, 0])
     center2 = np.array([0, 1.5 * radius, 0])
