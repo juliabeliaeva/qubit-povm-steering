@@ -19,15 +19,14 @@ from quantum_utils import normalize
 povm4_text = read_md("data/povm4.md")
 
 color_sequence = "D3"
-vector_color_ids = [0, 2, 3, 8]
-x5_color_ids = [7, 7]
 x5_labels = [latex_to_html("x̂_{5^{+}}"), latex_to_html("x̂_{5^{-}}")]
 
-colors = [get_color(color_sequence, i) for i in vector_color_ids]
-x5_colors = [get_color(color_sequence, i) for i in x5_color_ids]
+colors = [get_color("D3", 0), get_color("D3", 2),
+          get_color("D3", 3), get_color("T10", 5)]
+x5_colors = [get_color(color_sequence, i) for i in [7, 7]]
 
-colors_plus = [*colors[:2], get_color(color_sequence, x5_color_ids[0])]
-colors_minus = [*colors[2:], get_color(color_sequence, x5_color_ids[1])]
+colors_plus = [*colors[:2], x5_colors[0]]
+colors_minus = [*colors[2:], x5_colors[1]]
 
 region_colors_plus = [*colors_plus[:2], "rgb(0, 0, 0)"]
 region_color_minus = [*colors_minus[:2], "rgb(255, 255, 255)"]
@@ -57,7 +56,7 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
         y = tp[:, 1]
         z = tp[:, 2]
         slide_builder.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='lines', line=dict(color=color, width=1)))
-        mesh = get_polygon_mesh(x, y, z, 'white', opacity=0.5)
+        mesh = get_polygon_mesh(x, y, z, 'white', opacity=0.7)
         slide_builder.add_trace(mesh)
 
     slide_builder.add_line(povm4_text['povm3'])
@@ -67,6 +66,7 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
     slide_builder.add_line(povm4_text['povm3weknow'])
 
     update_layout(slide_builder)
+    update_meshes_lighting(slide_builder)
 
     return slide_builder
 
@@ -85,9 +85,7 @@ def get_polygon_mesh(x: np.ndarray, y: np.ndarray, z: np.ndarray, color: str,
 
     return go.Mesh3d(
         x=vertices[:, 0], y=vertices[:, 1], z=vertices[:, 2],
-        i=ti, j=tj, k=tk, opacity=opacity, color=color, showscale=False,
-        lightposition=dict(x=0, y=0, z=0),
-        lighting=dict(ambient=0.5, diffuse=0.8, specular=0.2, roughness=0.9, fresnel=0.1)
+        i=ti, j=tj, k=tk, opacity=opacity, color=color, showscale=False
     )
 
 
@@ -100,6 +98,13 @@ def update_layout(slide_builder: SlideBuilder):
                                     margin=dict(l=0, r=0, t=0, b=0),
                                     plot_bgcolor='white', title=None, showlegend=False)
     apply_orthographic_zoom(slide_builder.fig, zoom=2)
+
+
+def update_meshes_lighting(slide_builder: SlideBuilder):
+    for trace in slide_builder.fig.data:
+        if isinstance(trace, go.Mesh3d):
+            trace.lighting = dict(ambient=0.95, diffuse=0.8, specular=0.7, roughness=0.9)
+            trace.lightposition = dict(x=0.5, y=1, z=0)
 
 
 def plot_povm3_response() -> SlideBuilder:
@@ -172,9 +177,8 @@ def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
     slide_builder.hide_traces(traces_6regions + x5_axes_traces + circle_traces + label_traces)
 
     new_center1 = np.array([0, -2.3 * radius, 0])
-    regions_plus2 = plot_6regions(new_center1, vectors_plus,
-                                  region_colors_plus)
     new_center2 = np.array([0, 2.3 * radius, 0])
+    regions_plus2 = plot_6regions(new_center1, vectors_plus, region_colors_plus)
     regions_minus2 = plot_6regions(new_center2, vectors_minus, region_color_minus)
 
     slide_builder.add_traces(regions_plus2 + regions_minus2)
@@ -187,6 +191,7 @@ def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
                      label_height, label_depth)
 
     update_layout(slide_builder)
+    update_meshes_lighting(slide_builder)
 
     return slide_builder
 
@@ -269,6 +274,7 @@ def plot_povm4_response(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
     eye_distance = 1.5
     slide_builder.fig.update_layout(scene_camera=dict(eye=dict(x=eye_distance * 1, y=0,
                                                                z=eye_distance * 1)))
+    update_meshes_lighting(slide_builder)
 
     return slide_builder
 
