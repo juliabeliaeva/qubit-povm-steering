@@ -686,7 +686,7 @@ def get_18_regions(vectors1: List[np.ndarray], colors1: List[str],
 
 
 def plot_regions(regions: List[Region], center: np.ndarray,
-                 show_labels: bool = False, d: float = 1.12) -> List[BaseTraceType]:
+                 show_labels: bool = False, d: float = 1.12, x5_id: int = 2) -> List[BaseTraceType]:
     result = []
     for region in regions:
         name = " ".join([str(i) for i in region.h_idx])
@@ -700,16 +700,16 @@ def plot_regions(regions: List[Region], center: np.ndarray,
                 mean = np.mean(region.points, axis=0)
             else:
                 mean = np.mean(region.corners, axis=0)
-            c = d * normalize(mean)
+            label_position = d * normalize(mean) + center
             if len(region.h_idx) == 1:
-                region_id = ",".join([str(h + 1) if h != 2 else "5^+" for h in region.h_idx[0]])
+                region_id = ",".join([str(h + 1) if h != x5_id else "5^+" for h in region.h_idx[0]])
             else:
-                h1_id = [str(h + 1) if h != 2 else "5^+" for h in region.h_idx[0]]
-                h2_id = [str(h + 3) if h != 2 else "5^-" for h in region.h_idx[1]]
+                h1_id = [str(h + 1) if h != x5_id else "5^+" for h in region.h_idx[0]]
+                h2_id = [str(h + 3) if h != x5_id else "5^-" for h in region.h_idx[1]]
                 region_id = ",".join([*h1_id, *h2_id])
             latex_label = "$" + region_id + "$"
             label = latex_to_html(latex_label)
-            result.append(go.Scatter3d(x=[c[0]], y=[c[1]], z=[c[2]],
+            result.append(go.Scatter3d(x=[label_position[0]], y=[label_position[1]], z=[label_position[2]],
                                        mode='text', textfont=dict(size=30),
                                        text=[label], textposition='middle center'))
         result.append(mesh)
