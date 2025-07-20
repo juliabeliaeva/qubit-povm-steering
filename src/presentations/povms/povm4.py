@@ -767,7 +767,7 @@ def compute_solid_angle(corners: np.ndarray) -> float:
         next_corner = corners[(i + 1) % n, :]
         angle = spherical_angle(prev_corner, curr_corner, next_corner)
         angles.append(angle)
-    return sum(angles) - (n - 2) * np.pi
+    return (n - 2) * np.pi - sum(angles)
 
 
 def get_direction(region: Region) -> np.ndarray:
