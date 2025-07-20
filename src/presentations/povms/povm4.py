@@ -1,6 +1,6 @@
 import random
 from dataclasses import dataclass
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Dict, Set
 
 import numpy as np
 import plotly.graph_objects as go
@@ -10,8 +10,9 @@ from scipy.spatial import ConvexHull
 
 from crossections import make_orthogonal
 from latex_util import latex_to_html
-from plotly_utils import get_color, parse_rgb, mix_color_uniform, rgb_to_str, apply_orthographic_zoom
+from plotly_utils import get_color, parse_rgb, mix_color_uniform, rgb_to_str, apply_orthographic_zoom, create_cylinder
 from povms import QubitPovm, plot_sphere
+from presentations.povms.povm3 import get_x_y, get_response_table
 from presentations.povms.povms_common import read_md
 from presentations.povms.slides import SlideBuilder
 from quantum_utils import normalize
@@ -24,12 +25,6 @@ x5_labels = [latex_to_html("x̂_{5^{+}}"), latex_to_html("x̂_{5^{-}}")]
 colors = [get_color("D3", 0), get_color("D3", 2),
           get_color("D3", 3), get_color("T10", 5)]
 x5_colors = [get_color(color_sequence, i) for i in [7, 7]]
-
-colors_plus = [*colors[:2], x5_colors[0]]
-colors_minus = [*colors[2:], x5_colors[1]]
-
-region_colors_plus = [*colors_plus[:2], "rgb(0, 0, 0)"]
-region_color_minus = [*colors_minus[:2], "rgb(255, 255, 255)"]
 
 
 def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
@@ -130,6 +125,12 @@ def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
     labels_plus = [*labels[:2], x5_labels[0]]
     labels_minus = [*labels[2:], x5_labels[1]]
 
+    colors_plus = [*colors[:2], x5_colors[0]]
+    colors_minus = [*colors[2:], x5_colors[1]]
+
+    region_colors_plus = [*colors_plus[:2], "rgb(0, 0, 0)"]
+    region_colors_minus = [*colors_minus[:2], "rgb(255, 255, 255)"]
+
     vector_traces1 = plot_vectors(slide_builder, vectors_plus, colors_plus, labels_plus, center=center1,
                                   radius=radius)
     vector_traces2 = plot_vectors(slide_builder, vectors_minus, colors_minus, labels_minus, center=center2,
@@ -170,7 +171,7 @@ def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
     slide_builder.hide_traces(vector_traces1 + vector_traces2)
 
     regions_plus = plot_6regions(center1, vectors_plus, region_colors_plus)
-    regions_minus = plot_6regions(center2, vectors_minus, region_color_minus)
+    regions_minus = plot_6regions(center2, vectors_minus, region_colors_minus)
     traces_6regions = slide_builder.add_traces(regions_plus + regions_minus)
 
     slide_builder.next_step()
@@ -179,12 +180,13 @@ def plot_povm4_plus_minus_regions(povm: QubitPovm, radius=1) -> SlideBuilder:
     new_center1 = np.array([0, -2.3 * radius, 0])
     new_center2 = np.array([0, 2.3 * radius, 0])
     regions_plus2 = plot_6regions(new_center1, vectors_plus, region_colors_plus)
-    regions_minus2 = plot_6regions(new_center2, vectors_minus, region_color_minus)
+    regions_minus2 = plot_6regions(new_center2, vectors_minus, region_colors_minus)
 
     slide_builder.add_traces(regions_plus2 + regions_minus2)
-    slide_builder.add_traces(plot_18regions(np.array([0, 0, 0]),
-                                            vectors_plus, region_colors_plus,
-                                            vectors_minus, region_color_minus))
+    center3 = np.array([0, 0, 0])
+    slide_builder.add_traces(plot_regions(get_18_regions(vectors_plus, region_colors_plus,
+                                                         vectors_minus, region_colors_minus),
+                                          center3))
 
     plot_plot_labels(slide_builder, [new_center1, new_center2, zeros_like(new_center1)],
                      ["$\\Pi^+_{A_+}$", "$\\Pi^-_{A_-}$", "$\\Pi_{A = A_+ ∩ A_-}$"],
@@ -217,7 +219,13 @@ def plot_povm4_response(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
     vectors_plus = [povm.vectors[0], povm.vectors[1], x5]
     vectors_minus = [povm.vectors[2], povm.vectors[3], -x5]
 
-    regions = get_18_regions(vectors_plus, region_colors_plus, vectors_minus, region_color_minus, 5000)
+    colors_plus = [*colors[:2], x5_colors[0]]
+    colors_minus = [*colors[2:], x5_colors[1]]
+
+    region_colors_plus = [*colors_plus[:2], "rgb(0, 0, 0)"]
+    region_colors_minus = [*colors_minus[:2], "rgb(255, 255, 255)"]
+
+    regions = get_18_regions(vectors_plus, region_colors_plus, vectors_minus, region_colors_minus, n=5000)
     region_traces = plot_regions(regions, np.zeros(3), show_labels=True)
     region_traces = slide_builder.add_traces(region_traces)
     slide_builder.add_line(povm4_text['18regions'])
@@ -295,6 +303,143 @@ def plot_povm4_response_diagram() -> SlideBuilder:
     return slide_builder
 
 
+def plot_povm4_normalization(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
+    slide_builder = SlideBuilder("Normalization for response function of 18-Outcome POVM")
+
+    center1 = np.array([0, -1.5 * radius, 0])
+    center2 = np.array([0, 1.5 * radius, 0])
+
+    x5, mu5 = get_x5_mu5(povm)
+
+    colors_plus = [x5_colors[0], *colors[:2]]
+    colors_minus = [x5_colors[1], *colors[2:]]
+
+    region_colors_plus = ["rgb(0, 0, 0)", *colors_plus[1:]]
+    region_colors_minus = ["rgb(255, 255, 255)", *colors_minus[1:]]
+    vectors_plus = [x5, povm.vectors[0], povm.vectors[1]]
+    vectors_minus = [-x5, povm.vectors[2], povm.vectors[3]]
+
+    sphere_scale = 0.5
+    regions_plus = get_6regions(vectors_plus, region_colors_plus, radius=sphere_scale * radius, n=10000, alpha=None)
+    regions_minus = get_6regions(vectors_minus, region_colors_minus, radius=sphere_scale * radius, n=10000, alpha=None)
+    regions_plus_traces = plot_regions(regions_plus, center1)
+    regions_minus_traces = plot_regions(regions_minus, center2)
+    region6_traces = slide_builder.add_traces(regions_plus_traces + regions_minus_traces)
+
+    slide_builder.next_step()
+
+    k_plus = mu5 + povm.mus[0] + povm.mus[1]
+    povm_plus = QubitPovm(vectors_plus,
+                          [mu5 / k_plus, povm.mus[0] / k_plus, povm.mus[1] / k_plus], 0.5)
+    x_plus, y_plus = get_x_y(povm_plus)
+    response_table_plus = get_response_table(povm_plus, x_plus, y_plus)
+
+    k_minus = mu5 + povm.mus[2] + povm.mus[3]
+    povm_minus = QubitPovm(vectors_minus,
+                           [mu5 / k_minus, povm.mus[2] / k_minus, povm.mus[3] / k_minus], 0.5)
+    x_minus, y_minus = get_x_y(povm_minus)
+    response_table_minus = get_response_table(povm_minus, x_minus, y_minus)
+
+    r1_vector_traces = plot_response_vectors(slide_builder, regions_plus, center1,
+                                             radius=radius, sphere_scale=sphere_scale)
+    r2_vector_traces = plot_response_vectors(slide_builder, regions_minus, center2,
+                                             radius=radius, sphere_scale=sphere_scale)
+
+    r1_traces = plot_response_function(slide_builder, povm_plus, regions_plus, response_table_plus, center1,
+                                       colors_plus, radius=radius, sphere_scale=sphere_scale)
+    r2_traces = plot_response_function(slide_builder, povm_minus, regions_minus, response_table_minus, center2,
+                                       colors_minus, radius=radius, sphere_scale=sphere_scale)
+    slide_builder.next_step()
+    slide_builder.hide_traces(r1_traces)
+    slide_builder.hide_traces(r2_traces)
+
+    r1_traces = plot_response_function(slide_builder, povm_plus, regions_plus, response_table_plus, center1,
+                                       colors_plus, hide_vectors={0}, radius=radius, sphere_scale=sphere_scale)
+    r2_traces = plot_response_function(slide_builder, povm_minus, regions_minus, response_table_minus, center2,
+                                       colors_minus, hide_vectors={0}, radius=radius, sphere_scale=sphere_scale)
+    slide_builder.next_step()
+    slide_builder.hide_traces(r1_traces)
+    slide_builder.hide_traces(r2_traces)
+
+    response_table_plus_scaled = {k: k_plus * v if k[0] != 0 else (1 - k_plus * (1 - v))
+                                  for k, v in response_table_plus.items()}
+    response_table_minus_scaled = {k: k_minus * v if k[0] != 0 else (1 - k_minus * (1 - v))
+                                   for k, v in response_table_minus.items()}
+    r1_traces = plot_response_function(slide_builder, povm_plus, regions_plus, response_table_plus_scaled, center1,
+                                       colors_plus, hide_vectors={0}, radius=radius, sphere_scale=sphere_scale)
+    r2_traces = plot_response_function(slide_builder, povm_minus, regions_minus, response_table_minus_scaled, center2,
+                                       colors_minus, hide_vectors={0}, radius=radius, sphere_scale=sphere_scale)
+
+    slide_builder.next_step()
+    slide_builder.hide_traces(r1_traces)
+    slide_builder.hide_traces(r2_traces)
+    slide_builder.hide_traces(r1_vector_traces)
+    slide_builder.hide_traces(r2_vector_traces)
+
+    regions = get_18_regions([povm.vectors[0], povm.vectors[1], x5],
+                             [*colors_plus[1:], "rgb(0, 0, 0)"],
+                             [povm.vectors[2], povm.vectors[3], -x5],
+                             [*colors_minus[1:], "rgb(255, 255, 255)"], radius=sphere_scale * radius)
+
+    def reorder(t: Tuple[int, ...]) -> Tuple[int, ...]:
+        return tuple(sorted(1 if x == 0 else 2 if x == 1 else 0 if x == 2 else x for x in t))
+
+    regions18 = [Region(r.points, r.corners, r.simplices, r.color, [reorder(h) for h in r.h_idx]) for r in
+                 regions]
+    r1_vector_traces = plot_response_vectors(slide_builder, regions18, center1, radius=radius,
+                                             sphere_scale=sphere_scale)
+    r2_vector_traces = plot_response_vectors(slide_builder, regions18, center2, radius=radius,
+                                             sphere_scale=sphere_scale)
+    r1_traces = plot_response_function(slide_builder, povm_plus, regions18, response_table_plus_scaled,
+                                       center1, colors_plus, hide_vectors={0}, radius=radius, sphere_scale=sphere_scale)
+    r2_traces = plot_response_function(slide_builder, povm_minus, regions18, response_table_minus_scaled,
+                                       center2, colors_minus, hide_vectors={0}, radius=radius,
+                                       sphere_scale=sphere_scale, h_idx=1)
+
+    slide_builder.next_step()
+    slide_builder.hide_traces(r1_traces)
+    slide_builder.hide_traces(r2_traces)
+    slide_builder.hide_traces(r1_vector_traces)
+    slide_builder.hide_traces(r2_vector_traces)
+    slide_builder.hide_traces(region6_traces)
+
+    new_center1 = np.array([0, -2 * radius, 0])
+    new_center2 = np.array([0, 2 * radius, 0])
+    r1_vector_traces = plot_response_vectors(slide_builder, regions18, new_center1, radius=radius,
+                                             sphere_scale=sphere_scale)
+    r2_vector_traces = plot_response_vectors(slide_builder, regions18, new_center2, radius=radius,
+                                             sphere_scale=sphere_scale)
+    r1_traces = plot_response_function(slide_builder, povm_plus, regions18, response_table_plus_scaled,
+                                       new_center1, colors_plus, hide_vectors={0}, radius=radius,
+                                       sphere_scale=sphere_scale)
+    r2_traces = plot_response_function(slide_builder, povm_minus, regions18, response_table_minus_scaled,
+                                       new_center2, colors_minus, hide_vectors={0}, radius=radius,
+                                       sphere_scale=sphere_scale, h_idx=1)
+    regions_plus_traces = plot_regions(regions_plus, new_center1)
+    regions_minus_traces = plot_regions(regions_minus, new_center2)
+    region6_traces = slide_builder.add_traces(regions_plus_traces + regions_minus_traces)
+
+    center = np.zeros_like(center1)
+    slide_builder.add_traces(plot_regions(regions18, center))
+    r1_traces2 = plot_response_function(slide_builder, povm_plus, regions18, response_table_plus_scaled,
+                                        center, colors_plus, hide_vectors={0}, radius=radius,
+                                        sphere_scale=sphere_scale)
+    r2_traces2 = plot_response_function(slide_builder, povm_minus, regions18, response_table_minus_scaled,
+                                        center, colors_minus, hide_vectors={0}, radius=radius,
+                                        sphere_scale=sphere_scale, h_idx=1)
+    slide_builder.next_step()
+    slide_builder.hide_traces(r1_traces)
+    slide_builder.hide_traces(r2_traces)
+    slide_builder.hide_traces(r1_vector_traces)
+    slide_builder.hide_traces(r2_vector_traces)
+    slide_builder.hide_traces(region6_traces)
+
+    update_layout(slide_builder)
+    update_meshes_lighting(slide_builder)
+
+    return slide_builder
+
+
 def get_circle_points(center: np.ndarray, normal: np.ndarray, radius: float = 1,
                       num_points: int = 100):
     if abs(normal[2]) < 0.9:
@@ -367,9 +512,56 @@ class Region:
     h_idx: List[Tuple[int, ...]]
 
 
-def get_6regions(vectors: List[np.ndarray], colors: List[str],
+def plot_response_vectors(slide_builder: SlideBuilder, regions: List[Region],
+                          center: np.ndarray, povm_len: float = 0.7, radius: float = 1,
+                          sphere_scale: float = 1) -> List[int]:
+    traces = []
+    for r, center in zip(regions, ([center] * len(regions))):
+        direction = get_direction(r)
+        trace_id = slide_builder.add_trace(
+            go.Scatter3d(x=[sphere_scale * radius * direction[0] + center[0],
+                            (sphere_scale + povm_len) * radius * direction[0] + center[0]],
+                         y=[sphere_scale * radius * direction[1] + center[1],
+                            (sphere_scale + povm_len) * radius * direction[1] + center[1]],
+                         z=[sphere_scale * radius * direction[2] + center[2],
+                            (sphere_scale + povm_len) * radius * direction[2] + center[2]],
+                         mode='lines',
+                         line=dict(width=5, color='black')))
+        traces.append(trace_id)
+
+    return traces
+
+
+def plot_response_function(slide_builder: SlideBuilder, povm: QubitPovm, regions: List[Region],
+                           response_table: Dict[Tuple[int, Tuple], float],
+                           center: np.ndarray, colors: List[str], povm_len: float = 0.7,
+                           radius: float = 1, sphere_scale: float = 1, h_idx: int = 0,
+                           hide_vectors: Set[int] = set()) -> List[int]:
+    traces = []
+    for r, center in zip(regions, ([center] * len(regions))):
+        direction = get_direction(r)
+        start = radius * sphere_scale
+        for vector_index in range(povm.n_outcomes):
+            response_key = (vector_index, r.h_idx[h_idx])
+            if not response_key in response_table:
+                continue
+
+            end = start + povm_len * radius * response_table[response_key]
+            if vector_index in hide_vectors:
+                start = end
+                continue
+            line_color = colors[vector_index]
+            trace_id = slide_builder.add_trace(create_cylinder(start * direction + center, end * direction + center,
+                                                               radius=0.05, color=line_color))
+            traces.append(trace_id)
+            start = end
+
+    return traces
+
+
+def get_6regions(vectors: List[np.ndarray], colors: List[str], radius: float = 1,
                  n: int = 10000, alpha: Optional[float] = None) -> List[Region]:
-    sphere_x, sphere_y, sphere_z = get_sphere_points(n)
+    sphere_x, sphere_y, sphere_z = get_sphere_points(n, radius)
     points = np.stack((sphere_x, sphere_y, sphere_z), axis=-1)
 
     hemispheres = [(0,), (0, 1), (1,), (1, 2), (2,), (0, 2)]
@@ -386,18 +578,18 @@ def get_6regions(vectors: List[np.ndarray], colors: List[str],
         borders = get_border_normals(i, hemispheres, vectors)
         for (_, border_normal) in borders:
             theta = np.linspace(0, np.pi, 100)
-            half_circle = (np.outer(np.cos(theta), normal) + np.outer(np.sin(theta), border_normal))
+            half_circle = radius * (np.outer(np.cos(theta), normal) + np.outer(np.sin(theta), border_normal))
             filtered_points = np.vstack([filtered_points, half_circle])
 
         surface_simplices = get_surface_simplices(filtered_points)
-        result.append(Region(filtered_points, [normal, -normal], surface_simplices,
+        result.append(Region(filtered_points, [radius * normal, -radius * normal], surface_simplices,
                              rgb_to_str(hemisphere_colors[i], alpha), [h]))
     return result
 
 
 def plot_6regions(center: np.ndarray, vectors: List[np.ndarray], colors: List[str],
                   n: int = 10000, alpha: Optional[float] = None) -> List[BaseTraceType]:
-    return plot_regions(get_6regions(vectors, colors, n, alpha), center)
+    return plot_regions(get_6regions(vectors, colors, n=n, alpha=alpha), center)
 
 
 def get_border_normals(hemisphere_idx: int, hemispheres: List[Tuple[int, ...]],
@@ -431,16 +623,11 @@ def get_arc_points(p1: np.ndarray, p2: np.ndarray) -> np.ndarray:
             np.outer(np.sin(t_values * angle), p2)) / np.sin(angle)
 
 
-def plot_18regions(center: np.ndarray, vectors1: List[np.ndarray], colors1: List[str],
-                   vectors2: List[np.ndarray], colors2: List[str],
-                   n: int = 5000) -> List[BaseTraceType]:
-    return plot_regions(get_18_regions(vectors1, colors1, vectors2, colors2, n), center)
-
-
 def get_18_regions(vectors1: List[np.ndarray], colors1: List[str],
                    vectors2: List[np.ndarray], colors2: List[str],
+                   radius: float = 1,
                    n: int = 5000) -> List[Region]:
-    sphere_x, sphere_y, sphere_z = get_sphere_points(n)
+    sphere_x, sphere_y, sphere_z = get_sphere_points(n, radius)
     points = np.stack((sphere_x, sphere_y, sphere_z), axis=-1)
 
     hemispheres = [(0,), (0, 1), (1,), (1, 2), (2,), (0, 2)]
@@ -487,7 +674,7 @@ def get_18_regions(vectors1: List[np.ndarray], colors1: List[str],
 
             if corners is not None:
                 for c1, c2 in zip(corners, np.roll(corners, -1, axis=0)):
-                    arc_points = get_arc_points(c1, c2)
+                    arc_points = radius * get_arc_points(c1, c2)
                     filtered_points = np.vstack([filtered_points, arc_points])
 
             surface_simplices = get_surface_simplices(filtered_points)
@@ -538,7 +725,7 @@ def get_surface_simplices(filtered_points: np.ndarray) -> np.ndarray:
     return simplices[~np.any(simplices == center_idx, axis=1)]
 
 
-def get_sphere_points(n: int = 50) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def get_sphere_points(n: int = 50, radius: float = 1) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     golden_ratio = (1 + np.sqrt(5)) / 2
     indices = np.arange(n)
     theta = 2 * np.pi * indices / golden_ratio
@@ -546,7 +733,7 @@ def get_sphere_points(n: int = 50) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     phi = np.acos(z)
     x = np.sin(phi) * np.cos(theta)
     y = np.sin(phi) * np.sin(theta)
-    return x, y, z
+    return radius * x, radius * y, radius * z
 
 
 def get_oriented_simplices(hull: ConvexHull) -> np.ndarray:
