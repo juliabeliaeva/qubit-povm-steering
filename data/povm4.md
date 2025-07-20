@@ -70,3 +70,28 @@ $$\begin{multline}\sum_{a=1}^4 p(a|A) = k_+ p_+(1|A_+) + k_+ p_+(2|A_+)  + \\ + 
 <!--18regionsnorm3-->
 Let's check normalization:
 $$\begin{multline}\sum_{a=1}^4 p(a|A) = k_+ p_+(1|A_+) + k_+ p_+(2|A_+) + \\ + k_- p_-(3|A_-) + k_- p_-(4|A_-) = \\ = k_+(1 - p_+(5^+|A_+)) + k_-(1 - p_-(5^-|A_-)) = \\ = k_+ + k_- - 2\mu_5 = \mu_1 + \mu_2 + \mu_5 + \\ + \mu_3 + \mu_4 + \mu_5 - 2\mu_5 = 1\end{multline}$$
+<!--18regionsdiagram-->
+$$
+\begin{array}{rcl}
+    &\Pi_{\hat{\lambda}} &\\
+    &\downarrow &\\
+    &\Pi_{A = A_+ \cap A_-} &\\
+    &\swarrow\quad\quad\quad \searrow & \\
+    \Pi^+_{A_+} & &\Pi^-_{A_-}\\
+    \swarrow\quad\quad & &\quad\quad\searrow \\
+    \frac{1}{k_+}\{ M_{5^+}^{r=\frac{1}{2}}, M_{1}^{r=\frac{1}{2}}, M_{2}^{r=\frac{1}{2}} \} & &\frac{1}{k_-}\{ M_{5^-}^{r=\frac{1}{2}}, M_{3}^{r=\frac{1}{2}}, M_{4}^{r=\frac{1}{2}} \}
+\end{array}
+$$
+<!--18regionsdiagram2-->
+$M_{a}^{r=\frac{1}{2}}$ are simulated with either $\Pi^+_{A_+}$ or $\Pi^+_{A_-}$:
+$$\begin{array}{rlcrl}
+M_1^{r=\frac{1}{2}} &= k_+ \sum_{A_+ \subset \{5^+, 1, 2\} } p_+(1|A_+) \Pi^+_{A_+} &\quad &M_3^{r=\frac{1}{2}} &= k_- \sum_{A_- \subset \{5^-, 3, 4\} } p_-(3|A_-) \Pi^-_{A_-}\\
+M_2^{r=\frac{1}{2}} &= k_+ \sum_{A_+ \subset \{5^+, 1, 2\} } p_+(2|A_+) \Pi^+_{A_+} &\quad &M_4^{r=\frac{1}{2}} &= k_- \sum_{A_- \subset \{5^-, 3, 4\} } p_-(4|A_-) \Pi^-_{A_-}
+\end{array}
+$$
+<!--18regionsdiagram3-->
+$\Pi^+_{A_+}$ and $\Pi^+_{A_-}$ can be expressed using $\Pi_{A = A_+ \cap A_-}$
+<!--18regionsdiagram4-->
+$\Pi_{A = A_+ \cap A_-}$ can be expressed with $\Pi_{\hat{\lambda}}$
+<!--18regionsnewnorm-->
+Why normalization works?

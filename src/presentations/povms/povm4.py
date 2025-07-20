@@ -273,6 +273,22 @@ def plot_povm4_response(povm: QubitPovm, radius: float = 1) -> SlideBuilder:
     return slide_builder
 
 
+def plot_povm4_response_diagram() -> SlideBuilder:
+    slide_builder = SlideBuilder("Simulation with 18-Outcome POVM")
+
+    slide_builder.add_line(povm4_text['18regionsdiagram'])
+    slide_builder.next_step()
+    slide_builder.add_line(povm4_text['18regionsdiagram2'])
+    slide_builder.next_step()
+    slide_builder.add_line(povm4_text['18regionsdiagram3'])
+    slide_builder.next_step()
+    slide_builder.add_line(povm4_text['18regionsdiagram4'])
+    slide_builder.next_step()
+    slide_builder.add_line(povm4_text['18regionsnewnorm'])
+
+    return slide_builder
+
+
 def get_circle_points(center: np.ndarray, normal: np.ndarray, radius: float = 1,
                       num_points: int = 100):
     if abs(normal[2]) < 0.9:
