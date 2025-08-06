@@ -100,7 +100,7 @@ def get_hemisphere_indices(angle: float, vector_angles: List[float]) -> Set[int]
 
 
 def plot_povm_vectors(slide_builder: SlideBuilder, vectors: List[Tuple[float, str, str]],
-                      radius: float) -> Tuple[List[int], List[int]]:
+                      radius: float, label_distance=0.1) -> Tuple[List[int], List[int]]:
     vector_traces = []
     label_traces = []
     for vector_angle, vector_name, vector_color in vectors:
@@ -110,10 +110,12 @@ def plot_povm_vectors(slide_builder: SlideBuilder, vectors: List[Tuple[float, st
                                                                 mode='lines', zorder=10,
                                                                 line=dict(color=vector_color, width=8),
                                                                 name=vector_name)))
-        label_traces.append(slide_builder.add_trace(go.Scatter(x=[0.5 * x], y=[0.5 * y],
+        normal_x, normal_y = (y, -x) if x > 0 else (-y, x)
+        label_traces.append(slide_builder.add_trace(go.Scatter(x=[0.5 * x + normal_x * label_distance],
+                                                               y=[0.5 * y + normal_y * label_distance],
                                                                mode='text',
                                                                text=[vector_name],
-                                                               textposition='bottom center',
+                                                               textposition='middle center',
                                                                textfont=dict(size=32), zorder=10)))
     vector_traces.append(slide_builder.add_trace(go.Scatter(x=[0], y=[0], mode='markers',
                                                             marker=dict(color='black', size=8), zorder=11)))
