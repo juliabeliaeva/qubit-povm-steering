@@ -35,11 +35,11 @@ slides: List[AbstractSlideBuilder] = [TitleSlideBuilder(title, 1,
                                       TitleSlideBuilder("4-Outcome Measurements", level=2),
                                       plot_povm4(povm4),
                                       plot_povm4_plus_minus_regions(povm4),
-                                      plot_povm4_response_diagram(),
                                       plot_povm4_normalization(povm4),
                                       TitleSlideBuilder("The End", level=2),
                                       plot_flat_povm_proof(),
                                       plot_povm3_response(),
+                                      plot_povm4_response_diagram(),
                                       plot_povm4_response(povm4)]
 max_slides = sum([s.n_steps for s in slides])
 
