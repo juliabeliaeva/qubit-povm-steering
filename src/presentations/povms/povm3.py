@@ -46,31 +46,12 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
         parent_traces.append(trace)
 
     slide_builder.next_step()
-    slide_builder.add_line(povm3_text['simpleresponce'])
+    slide_builder.add_line(povm3_text['coarsesim'])
 
     slide_builder.next_step()
     slide_builder.hide_traces(label_traces)
     plot_hemispheres(slide_builder, vectors, radius)
-
-    slide_builder.next_step()
-
-    response_table_before = get_response_table_pvm(povm)
-    traces_before = plot_response_function(slide_builder, povm, angles, colors, line_angles,
-                                           response_table_before, radius)
-
-    slide_builder.next_step()
-    slide_builder.add_line(povm3_text['simplenormalization'])
-    slide_builder.next_step()
-    slide_builder.add_line(povm3_text['simpleintegral'])
-    slide_builder.next_step()
-    slide_builder.add_line(povm3_text['letsfix'])
-
-    slide_builder.next_step()
-    slide_builder.hide_all_lines()
-    slide_builder.hide_traces(traces_before)
-
-    slide_builder.add_line(povm3_text['coarsesim'])
-    slide_builder.next_step()
+    slide_builder.add_line(povm3_text['6regions'])
 
     sector_angles = get_sector_angles(angles)
     sector_traces = []
@@ -84,8 +65,8 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
                                                           showlegend=False))
         sector_traces.append(sector_trace)
 
-    slide_builder.add_line(povm3_text['6regions'])
     slide_builder.next_step()
+
     coarse1 = slide_builder.add_line(povm3_text['coarse'])
     slide_builder.next_step()
     slide_builder.hide_line(coarse1)
@@ -128,17 +109,28 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder.next_step()
     slide_builder.hide_traces(coarse_labels)
     slide_builder.hide_all_lines()
+    slide_builder.add_line(povm3_text['responceempty'])
+    slide_builder.next_step()
+    slide_builder.hide_all_lines()
+
     slide_builder.add_line(povm3_text['responceunnorm'], 'responceunnorm')
 
+    response_table_before = get_response_table_pvm(povm)
     traces_before2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
                                             response_table_before, radius)
     slide_builder.next_step()
+
+    slide_builder.add_line(povm3_text['simplenormalization'])
+    slide_builder.next_step()
+    slide_builder.add_line(povm3_text['simpleintegral'])
+    slide_builder.next_step()
+
     slide_builder.hide_all_lines()
     slide_builder.add_line(povm3_text['responcenorm'], 'responcenorm')
 
     response_traces = traces_before2
     xy_line = None
-    scales = [1, 0, 0.33, 0.66, 1]
+    scales = [1, 1]
     for i, scale in enumerate(scales):
         slide_builder.hide_traces(response_traces)
         if xy_line is not None:

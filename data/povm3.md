@@ -32,14 +32,24 @@ $$\hat{\lambda}_1 = \frac{\hat{x}_2 + \hat{x}_3}{|\hat{x}_2 + \hat{x}_3|}\text{,
 Coarse-grained POVM:
 
 $$\underbrace{\Pi_{\hat{\lambda}}}_{\substack{\text{parent POVM}\\\text{infinite}}} \xrightarrow{\text{simulates}} \underbrace{\Pi_A}_{\substack{\text{coarse-grained POVM}\\\text{finite}}} \xrightarrow{\text{simulates}} \underbrace{M_a^{r=\frac{1}{2}}}_{\text{target}}$$
+<!--responceempty-->
+Response function table:
+
+|                       | $\Pi_{\{2,3\}}$ | $\Pi_{\{1,3\}}$ | $\Pi_{\{1,2\}}$ | $\Pi_{\{3\}}$ | $\Pi_{\{2\}}$ | $\Pi_{\{1\}}$ |
+|:---------------------:|:---------------:|:---------------:|:---------------:|:-------------:|:-------------:|:-------------:|
+| $M_1^{r=\frac{1}{2}}$ |                 |                 |                 |               |               |               |
+| $M_2^{r=\frac{1}{2}}$ |                 |                 |                 |               |               |               |
+| $M_3^{r=\frac{1}{2}}$ |                 |                 |                 |               |               |               |
+
 <!--responceunnorm-->
-Original (unnormalized) response function:
+Constant response function:
 
 |                       | $\Pi_{\{2,3\}}$ | $\Pi_{\{1,3\}}$ | $\Pi_{\{1,2\}}$ | $\Pi_{\{3\}}$ | $\Pi_{\{2\}}$ | $\Pi_{\{1\}}$ |
 |:---------------------:|:---------------:|:---------------:|:---------------:|:-------------:|:-------------:|:-------------:|
 | $M_1^{r=\frac{1}{2}}$ |                 |    $2\mu_1$     |    $2\mu_1$     |               |               |   $2\mu_1$    |
 | $M_2^{r=\frac{1}{2}}$ |    $2\mu_2$     |                 |    $2\mu_2$     |               |   $2\mu_2$    |               |
 | $M_3^{r=\frac{1}{2}}$ |    $2\mu_3$     |    $2\mu_3$     |                 |   $2\mu_3$    |               |               |
+
 <!--responcenorm-->
 Modified response function:
 
@@ -119,7 +129,7 @@ Y &= \frac{\theta_1(1-2\mu_1) + \theta_2(1-2\mu_2) - \theta_3(1-2\mu_3)}{2\theta
 <!--coarseneedsigma1-->
 Coefficients in front of $\vec{\sigma}$:
 $$
-(1-2\mu_1)\hat{\lambda}'_3 - \hat{\lambda}'_2 + (2\mu_2 - X) \hat{\lambda}'_1 - Y\hat{\lambda}'_1 = 2\mu_2\hat{x}'_2 
+(1-2\mu_1)\hat{\lambda}'_3 - \hat{\lambda}'_2 + (2\mu_2 - X) \hat{\lambda}'_1 - Y\hat{\lambda}'_1 = 2\mu_2\hat{x}'_2
 $$
 <!--coarseneedsigma2-->
 We already know that:
@@ -129,7 +139,7 @@ $$
 <!--coarseneedsigma3-->
 Subtracting, we get:
 $$
-(1-2\mu_1-2\mu_2)\hat{\lambda}'_3 + (2\mu_2-1) \hat{\lambda}'_2 + (-Y - X) \hat{\lambda}'_1 = 0 
+(1-2\mu_1-2\mu_2)\hat{\lambda}'_3 + (2\mu_2-1) \hat{\lambda}'_2 + (-Y - X) \hat{\lambda}'_1 = 0
 $$
 <!--coarseneedsigma4-->
 Which we can rewrite as:
