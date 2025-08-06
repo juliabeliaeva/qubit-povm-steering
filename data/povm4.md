@@ -17,6 +17,9 @@ where
 $$\begin{aligned}M_{5^\pm}^{r=\frac{1}{2}} &= \mu_5\left(\mathbb{I} + \frac{1}{2}\hat{x}_{5^\pm}\cdot \vec{\sigma}\right)\\k_+ &= \mu1 + \mu2 + \mu5\\\quad k_- &= \mu3 + \mu4 + \mu5\\\end{aligned}$$
 <!--povm3weknow-->
 We know how to simulate 3-outcome POVMs!
+<!--povm3weknow2-->
+Define coarse-grained POVMs $\Pi^+_{A_+}$ and $\Pi^-_{A_-}$:
+$$\begin{align}\Pi^+_{A_+} \xrightarrow{\text{simulates}} \frac{1}{k_+}\{ M_{5^+}^{r=\frac{1}{2}}, M_{1}^{r=\frac{1}{2}}, M_{2}^{r=\frac{1}{2}} \}\\ \Pi^-_{A_-} \xrightarrow{\text{simulates}} \frac{1}{k_-}\{ M_{5^-}^{r=\frac{1}{2}}, M_{3}^{r=\frac{1}{2}}, M_{4}^{r=\frac{1}{2}} \}\end{align}$$
 <!--responsepm-->
 Coarse-grained POVMs $\{\Pi^{\pm}_{A_\pm}\}$:
 $$\begin{array}{l}

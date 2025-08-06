@@ -31,10 +31,8 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     vectors = list(zip(angles, labels, colors))
 
     vector_traces, label_traces = plot_povm_vectors(slide_builder, vectors, radius)
-    # slide_builder.add_line(povm3_text['3outnoisy'])
 
     slide_builder.next_step()
-    # slide_builder.add_line(povm3_text['parent'])
 
     line_angles = [2 * np.pi * i / num_lines for i in range(num_lines)]
     parent_traces = []
@@ -120,35 +118,26 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
                                             response_table_before, radius, width=20)
     slide_builder.next_step()
 
-    slide_builder.add_line(povm3_text['simplenormalization'])
+    simple_lines = [slide_builder.add_line(povm3_text['simplenormalization'])]
     slide_builder.next_step()
-    slide_builder.add_line(povm3_text['simpleintegral'])
+    simple_lines.append(slide_builder.add_line(povm3_text['simpleintegral']))
+    slide_builder.next_step()
+
+    slide_builder.hide_lines(simple_lines)
+    slide_builder.add_line(povm3_text['lineardep'])
+    slide_builder.add_line(povm3_text['lineardep2'])
     slide_builder.next_step()
 
     slide_builder.hide_all_lines()
     slide_builder.add_line(povm3_text['responcenorm'], 'responcenorm')
 
     response_traces = traces_before2
-    xy_line = None
-    scales = [1, 1]
-    for i, scale in enumerate(scales):
-        slide_builder.hide_traces(response_traces)
-        if xy_line is not None:
-            slide_builder.hide_line(xy_line)
-
-        x, y = get_x_y(povm, scale)
-        response_table_after = get_response_table(povm, x, y)
-        response_traces = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
-                                                 response_table_after, radius, width=20)
-        if i == 0:
-            slide_builder.next_step()
-            slide_builder.add_line(povm3_text['simulates'])
-            slide_builder.next_step()
-        elif i != len(scales) - 1:
-            xy_line = slide_builder.add_line(f"$X = {x:.2f}, Y = {y:.2f}$")
-            slide_builder.next_step()
-        else:
-            xy_line = slide_builder.add_line(povm3_text['simulatesanswer'])
+    slide_builder.hide_traces(response_traces)
+    x, y = get_x_y(povm, 1)
+    response_table_after = get_response_table(povm, x, y)
+    plot_response_function(slide_builder, povm, angles, colors, sector_angles,
+                                             response_table_after, radius, width=20)
+    slide_builder.add_line(povm3_text['simulatesanswer'])
 
     update_layout(slide_builder.fig)
 

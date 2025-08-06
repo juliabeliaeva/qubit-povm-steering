@@ -11,7 +11,7 @@ Does a similar response function work?
 $$p(a|\{\hat{x}_a\},\hat{\lambda}) = 2\mu_a \Theta(\hat{x}_a\cdot\hat{\lambda})$$
 <!--simpleintegral-->
 But we can simulate $M_a^{r=\frac{1}{2}}$:
-$$\begin{align}\int_S d\hat{\lambda} p(a|\{\hat{x}_a\},\hat{\lambda}) \Pi_{\hat{\lambda}} &= 2\mu_a\frac{1}{4\pi} \int_{\hat{x}_a\cdot\hat{\lambda} >0} d\hat{\lambda} (\mathbb{I} + \hat{\lambda} \cdot \vec{\sigma}) =\\&= 2\mu_a\frac{1}{2}\left(\mathbb{I} + \frac{1}{2} \hat{x}_a \cdot \vec{\sigma}\right) = M_a^{r=\frac{1}{2}}\end{align}$$
+$$\begin{align}\sum_{a \in A} 2\mu_a \Pi_A &= \int_{\hat{x}_a\cdot\hat{\lambda} >0} d\hat{\lambda} 2 \mu_a \Pi_{\hat{\lambda}} =\\&= 2\mu_a\frac{1}{4\pi} \int_{\hat{x}_a\cdot\hat{\lambda} >0} d\hat{\lambda} (\mathbb{I} + \hat{\lambda} \cdot \vec{\sigma}) =\\&= 2\mu_a\frac{1}{2}\left(\mathbb{I} + \frac{1}{2} \hat{x}_a \cdot \vec{\sigma}\right) = M_a^{r=\frac{1}{2}}\end{align}$$
 <!--simplenormalization-->
 This response function is not normalized:  
 $$\sum_a p(a|\{\hat{x}_a\},\hat{\lambda}) \neq 1$$
@@ -50,6 +50,11 @@ Constant response function:
 | $M_2^{r=\frac{1}{2}}$ |    $2\mu_2$     |                 |    $2\mu_2$     |               |   $2\mu_2$    |               |
 | $M_3^{r=\frac{1}{2}}$ |    $2\mu_3$     |    $2\mu_3$     |                 |   $2\mu_3$    |               |               |
 
+<!--lineardep-->
+Linear dependencies between operators:
+$$\sum_{a \in \{1,2,3\}} (1 - 2\mu_a)(\Pi_{\{a\}} - \Pi_{\{a\}^c}) = 0$$
+<!--lineardep2-->
+$$\frac{1}{\theta_a}(\Pi_{\{a\}} + \Pi_{\{a\}^c}) = \frac{1}{\theta_{a'}}(\Pi_{\{a'\}} + \Pi_{\{a'\}^c})$$
 <!--responcenorm-->
 Modified response function:
 
@@ -58,8 +63,6 @@ Modified response function:
 | $M_1^{r=\frac{1}{2}}$ |                 |    $2\mu_1$     |    $2\mu_1$     |               |               |   $2\mu_1$    |
 | $M_2^{r=\frac{1}{2}}$ |  $2\mu_2 - X$   |                 |  $1 - 2\mu_1$   |               |      $1$      |      $Y$      |
 | $M_3^{r=\frac{1}{2}}$ |  $2\mu_3 - Y$   |  $1 - 2\mu_1$   |                 |      $1$      |               |      $X$      |
-
-We need $2 \mu_1 + X + Y = 1$, $X \le 2\mu_2$ and $Y \le 2\mu_3$.
 <!--simulates-->
 Can we find such $X$ and $Y$ to simulate $M_a^{r=\frac{1}{2}}$?
 <!--simulatesanswer-->
