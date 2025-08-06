@@ -117,7 +117,7 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
 
     response_table_before = get_response_table_pvm(povm)
     traces_before2 = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
-                                            response_table_before, radius)
+                                            response_table_before, radius, width=20)
     slide_builder.next_step()
 
     slide_builder.add_line(povm3_text['simplenormalization'])
@@ -139,7 +139,7 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
         x, y = get_x_y(povm, scale)
         response_table_after = get_response_table(povm, x, y)
         response_traces = plot_response_function(slide_builder, povm, angles, colors, sector_angles,
-                                                 response_table_after, radius)
+                                                 response_table_after, radius, width=20)
         if i == 0:
             slide_builder.next_step()
             slide_builder.add_line(povm3_text['simulates'])

@@ -71,7 +71,7 @@ def get_response_table_pvm(povm: QubitPovm) -> Dict[Tuple[int, Tuple], float]:
 def plot_response_function(slide_builder: SlideBuilder, povm: QubitPovm,
                            vector_angles: List[float], vector_colors: List[str],
                            line_angles: List[float], response_table: Dict[Tuple[int, Tuple], float],
-                           radius: float = 1) -> Set[int]:
+                           radius: float = 1, width=8) -> Set[int]:
     traces = set()
     for line_angle in line_angles:
         hemisphere_indices = get_hemisphere_indices(line_angle, vector_angles)
@@ -87,7 +87,7 @@ def plot_response_function(slide_builder: SlideBuilder, povm: QubitPovm,
             trace_id = slide_builder.add_trace(
                 go.Scatter(x=[start * math.cos(line_angle), end * math.cos(line_angle)],
                            y=[start * math.sin(line_angle), end * math.sin(line_angle)],
-                           mode='lines', line=dict(color=line_color, width=8),
+                           mode='lines', line=dict(color=line_color, width=width),
                            showlegend=False, hoverinfo='skip'))
             traces.add(trace_id)
             start = end
