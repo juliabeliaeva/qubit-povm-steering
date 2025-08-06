@@ -1,3 +1,4 @@
+import itertools
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Dict, Set, Iterable, List, Tuple, Optional
@@ -138,18 +139,32 @@ class SlideBuilder(AbstractSlideBuilder):
 
 
 class TitleSlideBuilder(AbstractSlideBuilder):
-    def __init__(self, title: str, level: int = 1):
+    def __init__(self, title: str, level: int = 1, subtitle: Optional[str] = None):
         self.title = title
         self.level = level
+        self.subtitle = subtitle
 
     @property
     def n_steps(self):
         return 1
 
     def build_components(self, slide: int, step: int) -> List[Component]:
+        style = {'textAlign': "center", 'fontFamily': "'Lato', sans-serif"}
+
         heading_constructor = [html.H1, html.H2, html.H3, html.H4, html.H5, html.H6][self.level - 1]
-        heading = heading_constructor(self.title,
-                                      style={'textAlign': "center", 'fontFamily': "'Lato', sans-serif"})
-        return [html.Div(children=[heading],
-                         style={"display": "flex", "justifyContent": "center", "alignItems": "center",
+        heading = heading_constructor(split_into_elements(self.title), style=style)
+
+        children = [heading]
+        if self.subtitle is not None:
+            children.append(html.H5(split_into_elements(self.subtitle), style=style))
+
+        return [html.Div(children=children,
+                         style={"display": "flex", "flexDirection": "column",
+                                "justifyContent": "center", "alignItems": "center",
                                 "height": "100vh", "width": "100vw"})]
+
+
+def split_into_elements(text: str) -> List:
+    split_text = text.split("\n")
+    text_elements = [[t, html.Br()] if i != len(split_text) - 1 else [t] for i, t in enumerate(split_text)]
+    return list(itertools.chain(*text_elements))
