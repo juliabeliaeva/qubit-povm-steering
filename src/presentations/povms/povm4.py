@@ -99,7 +99,7 @@ def update_layout(slide_builder: SlideBuilder):
                                     scene_camera=dict(eye=dict(x=1, y=0, z=1)),
                                     font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif"),
                                     margin=dict(l=0, r=0, t=0, b=0),
-                                    plot_bgcolor='white', title=None, showlegend=False)
+                                    plot_bgcolor='white', title=None, showlegend=False, hovermode=False)
     apply_orthographic_zoom(slide_builder.fig, zoom=2)
 
 
