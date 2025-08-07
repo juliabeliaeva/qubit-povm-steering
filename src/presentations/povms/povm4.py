@@ -65,6 +65,9 @@ def plot_povm4(povm: QubitPovm, radius=1.0) -> SlideBuilder:
     slide_builder.hide_all_lines()
     slide_builder.add_line(povm4_text['povm3weknow2'])
 
+    slide_builder.next_step()
+    slide_builder.add_line(povm4_text['povm3weknow3'])
+
     update_layout(slide_builder)
     update_meshes_lighting(slide_builder)
 
@@ -376,11 +379,40 @@ def plot_povm4_normalization(povm: QubitPovm, radius: float = 1) -> SlideBuilder
                                        colors_minus, hide_vectors={0}, radius=radius, sphere_scale=sphere_scale)
 
     slide_builder.next_step()
+
+    distance = 1.1 * radius
+    direction_plus = get_direction(regions_plus[0])
+    label1 = "k_+(1 - \\frac{2μ_5}{k_+})"
+    l_plus = slide_builder.add_trace(go.Scatter3d(x=[center1[0] + distance * direction_plus[0]],
+                                                  y=[center1[1] + distance * direction_plus[1]],
+                                                  z=[center1[2] + distance * direction_plus[2]],
+                                                  mode="text", textfont=dict(size=32),
+                                                  text=[latex_to_html(label1)],
+                                                  textposition='middle left'))
+
+    direction_minus = get_direction(regions_minus[3])
+    label2 = "k_-"
+    l_minus = slide_builder.add_trace(go.Scatter3d(x=[center2[0] + distance * direction_minus[0]],
+                                                   y=[center2[1] + distance * direction_minus[1]],
+                                                   z=[center2[2] + distance * direction_minus[2]],
+                                                   mode="text", textfont=dict(size=32),
+                                                   text=[latex_to_html(label2)],
+                                                   textposition='middle left'))
+
+    label_sum = label1 + " + " + label2 + " = k_+ + k_1 - 2μ_5 = μ_1 + μ_2 + μ_5 + μ_3 + μ_4 + μ_5 - 2μ_5 = 1"
+    l_sum = slide_builder.add_trace(go.Scatter3d(x=[0],
+                                                 y=[0],
+                                                 z=[radius * 2],
+                                                 mode='text', textfont=dict(size=30),
+                                                 text=[latex_to_html(label_sum)], textposition='middle center'))
+
+    slide_builder.next_step()
     slide_builder.hide_traces(r1_traces)
     slide_builder.hide_traces(r2_traces)
     slide_builder.hide_traces(r1_vector_traces)
     slide_builder.hide_traces(r2_vector_traces)
     slide_builder.hide_traces(region6_traces)
+    slide_builder.hide_traces([l_plus, l_minus, l_sum])
 
     regions18 = get_18_regions([povm.vectors[0], povm.vectors[1], x5],
                                [*colors_plus[1:], "rgb(0, 0, 0)"],
