@@ -399,7 +399,7 @@ def plot_povm4_normalization(povm: QubitPovm, radius: float = 1) -> SlideBuilder
                                                    text=[latex_to_html(label2)],
                                                    textposition='middle left'))
 
-    label_sum = label1 + " + " + label2 + " = k_+ + k_1 - 2μ_5 = μ_1 + μ_2 + μ_5 + μ_3 + μ_4 + μ_5 - 2μ_5 = 1"
+    label_sum = label1 + " + " + label2 + " = k_+ + k_- - 2μ_5 = μ_1 + μ_2 + μ_5 + μ_3 + μ_4 + μ_5 - 2μ_5 = 1"
     l_sum = slide_builder.add_trace(go.Scatter3d(x=[0],
                                                  y=[0],
                                                  z=[radius * 2],

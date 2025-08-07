@@ -124,6 +124,9 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder.next_step()
 
     slide_builder.hide_lines(simple_lines)
+    slide_builder.add_line(povm3_text['coarseexplicit2'])
+
+    slide_builder.next_step()
     slide_builder.add_line(povm3_text['lineardep'])
     slide_builder.add_line(povm3_text['lineardep2'])
     slide_builder.next_step()

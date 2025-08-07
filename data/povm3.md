@@ -50,6 +50,8 @@ Constant response function:
 | $M_2^{r=\frac{1}{2}}$ |    $2\mu_2$     |                 |    $2\mu_2$     |               |   $2\mu_2$    |               |
 | $M_3^{r=\frac{1}{2}}$ |    $2\mu_3$     |    $2\mu_3$     |                 |   $2\mu_3$    |               |               |
 
+<!--coarseexplicit2-->
+$$\begin{align}\Pi_{\{a\}} &= \frac{\theta_a}{2\pi}(\mathbb{I} - \frac{\pi \sin{\frac{\theta_a}{2}}}{2 \theta_a}\hat{\lambda}_a \cdot \vec{\sigma})\\\Pi_{\{a\}^c} &= \frac{\theta_a}{2\pi}(\mathbb{I} + \frac{\pi \sin{\frac{\theta_a}{2}}}{2 \theta_a}\hat{\lambda}_a \cdot \vec{\sigma})\end{align}$$  
 <!--lineardep-->
 Linear dependencies between operators:
 $$\sum_{a \in \{1,2,3\}} (1 - 2\mu_a)(\Pi_{\{a\}} - \Pi_{\{a\}^c}) = 0$$
