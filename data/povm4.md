@@ -21,7 +21,7 @@ We know how to simulate 3-outcome POVMs!
 Define coarse-grained POVMs $\Pi^+_{A_+}$ and $\Pi^-_{A_-}$:
 $$\begin{align}\Pi^+_{A_+} \xrightarrow{\text{simulates}} \frac{1}{k_+}\{ M_{5^+}^{r=\frac{1}{2}}, M_{1}^{r=\frac{1}{2}}, M_{2}^{r=\frac{1}{2}} \}\\ \Pi^-_{A_-} \xrightarrow{\text{simulates}} \frac{1}{k_-}\{ M_{5^-}^{r=\frac{1}{2}}, M_{3}^{r=\frac{1}{2}}, M_{4}^{r=\frac{1}{2}} \}\end{align}$$
 <!--povm3weknow3-->
-Merge $\Pi^+_{A_+}$ and $\Pi^-_{A_-}$ into $\Pi_{A = A_+ \cap A_-}$ to simulate $M_{a|x}^{r=\frac{1}{2}}$
+Merge $\Pi^+_{A_+}$ and $\Pi^-_{A_-}$ into $\Pi_{A = A_+ \cap A_-}$ to simulate $M_{a}^{r=\frac{1}{2}}$
 <!--responsepm-->
 Coarse-grained POVMs $\{\Pi^{\pm}_{A_\pm}\}$:
 $$\begin{array}{l}
