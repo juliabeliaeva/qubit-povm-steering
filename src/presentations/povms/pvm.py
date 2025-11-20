@@ -10,7 +10,7 @@ from presentations.povms.povms_common import get_angles, get_labels, plot_povm_v
     get_response_table_pvm, plot_response_function, update_layout, read_md
 from presentations.povms.slides import SlideBuilder
 
-pvm_text: Dict[str, str] = read_md("data/pvm.md")
+pvm_text: Dict[str, str] = read_md("data/povms/pvm.md")
 
 def plot_pvm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder = SlideBuilder("Projectors")

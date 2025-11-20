@@ -10,7 +10,7 @@ from presentations.povms.povms_common import get_angles, plot_povm_vectors, plot
     get_response_table_pvm, plot_response_function, get_hemisphere_indices, update_layout, read_md, get_labels
 from presentations.povms.slides import SlideBuilder
 
-povm3_text = read_md("data/povm3.md")
+povm3_text = read_md("data/povms/povm3.md")
 
 
 def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:

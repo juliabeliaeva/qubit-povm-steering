@@ -17,7 +17,7 @@ from presentations.povms.povms_common import read_md
 from presentations.povms.slides import SlideBuilder
 from quantum_utils import normalize
 
-povm4_text = read_md("data/povm4.md")
+povm4_text = read_md("data/povms/povm4.md")
 
 color_sequence = "D3"
 x5_labels = [latex_to_html("x̂_{5^{+}}"), latex_to_html("x̂_{5^{-}}")]
