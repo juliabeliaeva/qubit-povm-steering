@@ -11,7 +11,7 @@ from scipy.spatial import ConvexHull
 from crossections import make_orthogonal
 from latex_util import latex_to_html
 from plotly_utils import get_color, parse_rgb, mix_color_uniform, rgb_to_str, apply_orthographic_zoom, create_cylinder
-from povms import QubitPovm, plot_sphere
+from presentations.povms.povms import QubitPovm, plot_sphere
 from presentations.povms.povm3 import get_x_y, get_response_table
 from presentations.povms.povms_common import read_md
 from presentations.povms.slides import SlideBuilder

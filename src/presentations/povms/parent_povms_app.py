@@ -5,11 +5,10 @@ import numpy as np
 from dash import dcc, html, Input, Output
 from dash.development.base_component import Component
 from dash_extensions import Keyboard
-
-from povms import get_povm3, get_pvm, get_sample_povm4
 from presentations.povms.povm3 import plot_flat_povm, plot_flat_povm_proof
-from presentations.povms.povm4 import plot_povm4_plus_minus_regions, plot_povm4, plot_povm3_response, \
-    plot_povm4_response, plot_povm4_response_diagram, plot_povm4_normalization
+from presentations.povms.povm4 import plot_povm4_plus_minus_regions, plot_povm4, plot_povm4_normalization, \
+    plot_povm3_response, plot_povm4_response_diagram, plot_povm4_response
+from presentations.povms.povms import get_povm3, get_pvm, get_sample_povm4
 from presentations.povms.pvm import plot_pvm
 from presentations.povms.slides import AbstractSlideBuilder, TitleSlideBuilder
 

@@ -5,7 +5,7 @@ import numpy as np
 from plotly import graph_objects as go
 
 from plotly_utils import get_color
-from povms import QubitPovm
+from presentations.povms.povms import QubitPovm
 from presentations.povms.povms_common import get_angles, plot_povm_vectors, plot_hemispheres, \
     get_response_table_pvm, plot_response_function, get_hemisphere_indices, update_layout, read_md, get_labels
 from presentations.povms.slides import SlideBuilder

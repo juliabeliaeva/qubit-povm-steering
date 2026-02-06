@@ -6,7 +6,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 from plotly_utils import get_color_with_alpha
-from povms import QubitPovm
+from presentations.povms.povms import QubitPovm
 from presentations.povms.slides import SlideBuilder
 from quantum_utils import normalize
 
