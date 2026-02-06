@@ -26,7 +26,7 @@ slides: List[AbstractSlideBuilder] = [TitleSlideBuilder(title, 1,
                                                         subtitle="Models from Paper\n"
                                                                  "\"Exact Steering Bound for Two-Qubit Werner States\"\n"
                                                                  "by Yujie Zhang and Eric Chitambar\n"
-                                                                 "Visualizations by Julia Beliaeva"),
+                                                                 "Visualizations by Julia Beliaeva\n\n\n(Navigate by Left/Right Keys)"),
                                       TitleSlideBuilder("Projectors", level=2),
                                       plot_pvm(pvm),
                                       TitleSlideBuilder("3-Outcome Measurements", level=2),
