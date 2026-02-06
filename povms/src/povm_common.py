@@ -1,31 +1,13 @@
 import math
-import re
 from typing import List, Tuple, Set, Dict
 
 import numpy as np
-import plotly.graph_objects as go
-
-from plotly_utils import get_color_with_alpha
-from presentations.povms.povms import QubitPovm
-from presentations.povms.slides import SlideBuilder
-from quantum_utils import normalize
-
-
-def read_md(path: str) -> Dict[str, str]:
-    with open(path, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    pattern = r'<!--([a-zA-Z0-9]*)-->'
-    matches = list(re.finditer(pattern, content))
-    result: Dict[str, str] = {}
-    for i, match in enumerate(matches):
-        label = match.group(1)
-        text_start = match.end()
-        text_end = matches[i + 1].start() if i + 1 < len(matches) else len(content)
-        if not label:
-            label = str(i)
-        result[label] = content[text_start:text_end].strip()
-    return result
+from plotly import graph_objects as go
+from plotly.basedatatypes import BaseTraceType
+from qubit_povm import QubitPovm
+from slides import SlideBuilder
+from util.plotly import get_color_with_alpha
+from util.utils import normalize
 
 
 def get_angle(u: np.ndarray, v: np.ndarray, normal: np.ndarray) -> float:
@@ -136,9 +118,9 @@ def plot_hemispheres(slide_builder: SlideBuilder, vectors: List[Tuple[float, str
                                            hoverinfo='skip'))
 
 
-def update_layout(fig: go.Figure):
-    fig.update_layout(xaxis=dict(range=[-2.5, 2.5], showgrid=False, zeroline=False, showticklabels=False),
-                      yaxis=dict(range=[-2.5, 2.5], showgrid=False, zeroline=False, showticklabels=False,
-                                 scaleanchor="x", scaleratio=1),
-                      margin=dict(l=0, r=0, t=0, b=0),
-                      plot_bgcolor='white', title=None, showlegend=False)
+def plot_sphere(center: np.ndarray = np.zeros(3), radius: float = 1) -> BaseTraceType:
+    u, v = np.mgrid[0:2 * np.pi:60j, 0:np.pi:30j]
+    xs = radius * np.cos(u) * np.sin(v) + center[0]
+    ys = radius * np.sin(u) * np.sin(v) + center[1]
+    zs = radius * np.cos(v) + center[2]
+    return go.Surface(x=xs, y=ys, z=zs, opacity=0.03, showscale=False, hoverinfo='skip')

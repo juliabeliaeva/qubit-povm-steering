@@ -3,14 +3,14 @@ from typing import Dict, Tuple
 
 import numpy as np
 from plotly import graph_objects as go
+from povm_common import get_angles, plot_povm_vectors, plot_hemispheres, \
+    get_response_table_pvm, plot_response_function, get_hemisphere_indices, get_labels
+from qubit_povm import QubitPovm
+from slides import SlideBuilder
+from util.plotly import get_color, update_layout
+from util.utils import read_md
 
-from plotly_utils import get_color
-from presentations.povms.povms import QubitPovm
-from presentations.povms.povms_common import get_angles, plot_povm_vectors, plot_hemispheres, \
-    get_response_table_pvm, plot_response_function, get_hemisphere_indices, update_layout, read_md, get_labels
-from presentations.povms.slides import SlideBuilder
-
-povm3_text = read_md("data/povms/povm3.md")
+povm3_text = read_md("assets/povm3.md")
 
 
 def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
@@ -139,7 +139,7 @@ def plot_flat_povm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     x, y = get_x_y(povm, 1)
     response_table_after = get_response_table(povm, x, y)
     plot_response_function(slide_builder, povm, angles, colors, sector_angles,
-                                             response_table_after, radius, width=20)
+                           response_table_after, radius, width=20)
     slide_builder.add_line(povm3_text['simulatesanswer'])
 
     update_layout(slide_builder.fig)

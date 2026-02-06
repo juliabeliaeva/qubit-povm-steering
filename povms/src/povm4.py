@@ -6,18 +6,16 @@ import numpy as np
 import plotly.graph_objects as go
 from numpy.ma.core import zeros_like
 from plotly.basedatatypes import BaseTraceType
+from povm3 import get_x_y, get_response_table
+from povm_common import plot_sphere
+from qubit_povm import QubitPovm
 from scipy.spatial import ConvexHull
+from slides import SlideBuilder
+from util.latex import latex_to_html
+from util.plotly import get_color, parse_rgb, mix_color_uniform, rgb_to_str, apply_orthographic_zoom, create_cylinder
+from util.utils import read_md, normalize, make_orthogonal
 
-from crossections import make_orthogonal
-from latex_util import latex_to_html
-from plotly_utils import get_color, parse_rgb, mix_color_uniform, rgb_to_str, apply_orthographic_zoom, create_cylinder
-from presentations.povms.povms import QubitPovm, plot_sphere
-from presentations.povms.povm3 import get_x_y, get_response_table
-from presentations.povms.povms_common import read_md
-from presentations.povms.slides import SlideBuilder
-from quantum_utils import normalize
-
-povm4_text = read_md("data/povms/povm4.md")
+povm4_text = read_md("assets/povm4.md")
 
 color_sequence = "D3"
 x5_labels = [latex_to_html("x̂_{5^{+}}"), latex_to_html("x̂_{5^{-}}")]

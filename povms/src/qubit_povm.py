@@ -3,8 +3,6 @@ from dataclasses import dataclass
 from typing import List
 
 import numpy as np
-import plotly.graph_objects as go
-from plotly.basedatatypes import BaseTraceType
 from scipy.spatial.transform import Rotation
 
 
@@ -48,11 +46,3 @@ def get_sample_povm4() -> QubitPovm:
     mu_sum = mus[0] + mus[2] + mus[3] + mus[4]
     return QubitPovm([povm31.vectors[0], povm31.vectors[2], povm32.vectors[1], povm32.vectors[2]],
                      [mus[0] / mu_sum, mus[2] / mu_sum, mus[3] / mu_sum, mus[4] / mu_sum], r=1)
-
-
-def plot_sphere(center: np.ndarray = np.zeros(3), radius: float = 1) -> BaseTraceType:
-    u, v = np.mgrid[0:2 * np.pi:60j, 0:np.pi:30j]
-    xs = radius * np.cos(u) * np.sin(v) + center[0]
-    ys = radius * np.sin(u) * np.sin(v) + center[1]
-    zs = radius * np.cos(v) + center[2]
-    return go.Surface(x=xs, y=ys, z=zs, opacity=0.03, showscale=False, hoverinfo='skip')

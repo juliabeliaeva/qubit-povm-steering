@@ -3,14 +3,15 @@ from typing import Dict
 
 import numpy as np
 from plotly import graph_objects as go
+from povm_common import get_angles, get_labels, plot_povm_vectors, plot_hemispheres, \
+    get_response_table_pvm, plot_response_function
+from qubit_povm import QubitPovm
+from slides import SlideBuilder
+from util.plotly import get_color, update_layout
+from util.utils import read_md
 
-from plotly_utils import get_color
-from presentations.povms.povms import QubitPovm
-from presentations.povms.povms_common import get_angles, get_labels, plot_povm_vectors, plot_hemispheres, \
-    get_response_table_pvm, plot_response_function, update_layout, read_md
-from presentations.povms.slides import SlideBuilder
+pvm_text: Dict[str, str] = read_md("assets/pvm.md")
 
-pvm_text: Dict[str, str] = read_md("data/povms/pvm.md")
 
 def plot_pvm(povm: QubitPovm, radius=1.0, num_lines=102) -> SlideBuilder:
     slide_builder = SlideBuilder("Projectors")
