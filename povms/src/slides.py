@@ -114,7 +114,13 @@ class SlideBuilder(AbstractSlideBuilder):
         content = []
         if figure:
             style = {"width": "100%"} if not text else None
-            graph = dcc.Graph(figure=figure, mathjax=True, config={"scrollZoom": True}, style=style)
+            graph = dcc.Graph(figure=figure, mathjax=True,
+                              config=dcc.Graph.Config(scrollZoom=True,
+                                                      toImageButtonOptions=dcc.Graph.ConfigToImageButtonOptions(
+                                                          width=None, height=None,  # noqa (use current dims)
+                                                          scale=2
+                                                      )),
+                              style=style)
             if text:
                 content.append(graph)
             else:
