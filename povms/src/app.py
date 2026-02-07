@@ -23,10 +23,10 @@ povm3 = get_povm3(0.25, 0.32, 0.43,
 povm4 = get_sample_povm4()
 
 slides: List[AbstractSlideBuilder] = [TitleSlideBuilder(title, 1,
-                                                        subtitle="Models from Paper\n"
+                                                        subtitle="Based on\n"
                                                                  "\"Exact Steering Bound for Two-Qubit Werner States\"\n"
-                                                                 "by Yujie Zhang and Eric Chitambar\n"
-                                                                 "Visualizations by Julia Beliaeva\n\n\n(Navigate by Left/Right Keys)"),
+                                                                 "by Yujie Zhang and Eric Chitambar\n\n"
+                                                                 "Visualizations by Julia Beliaeva\n\n\n(Navigate using Left/Right Keys)"),
                                       TitleSlideBuilder("Projectors", level=2),
                                       plot_pvm(pvm),
                                       TitleSlideBuilder("3-Outcome Measurements", level=2),
@@ -36,6 +36,7 @@ slides: List[AbstractSlideBuilder] = [TitleSlideBuilder(title, 1,
                                       plot_povm4_plus_minus_regions(povm4),
                                       plot_povm4_normalization(povm4),
                                       TitleSlideBuilder("The End\nThank You for Listening!", level=2),
+                                      TitleSlideBuilder("Extra Slides", level=2),
                                       plot_flat_povm_proof(),
                                       plot_povm3_response(),
                                       plot_povm4_response_diagram(),
