@@ -1,5 +1,5 @@
-numpy~=2.2.6
-scipy~=1.15.1
+numpy~=2.4.4
+scipy~=1.17.1
 dash~=4.0.0
 dash-extensions~=2.0.4
 plotly~=6.0.1
