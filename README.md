@@ -1,4 +1,4 @@
-<img width="1070" height="412" alt="image" src="https://github.com/user-attachments/assets/23000ff9-f6a6-43a1-893b-ddbc6f7a878d" /># Joint Measurability of Noisy Qubit POVMs
+# Joint Measurability of Noisy Qubit POVMs
 
 Visualisations for the seminar presentation of the paper “Exact Steering Bound for Two-Qubit Werner States” [[1](#Zhang2024)].
 
