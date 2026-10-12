@@ -4,6 +4,19 @@ body {
     margin: 0;
 }
 
+.reveal .slides {
+    text-align: left;
+}
+
+.reveal .slides > section {
+    height: 100%;
+}
+
+/* step markers for reveal.js, the content of the steps is shown by slides.js */
+.reveal .fragment.step {
+    display: none;
+}
+
 .title-slide {
     display: flex;
     flex-direction: column;

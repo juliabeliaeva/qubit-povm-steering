@@ -105,7 +105,7 @@ class SlideBuilder(AbstractSlideBuilder):
 
             with tags.div(cls="slide-row"):
                 if self.fig.data:
-                    tags.div(id="graph", cls="graph")
+                    tags.div(cls="graph")
                     json_script(self.fig.to_json(), "figure-data")
 
                 text_class = "figure-slide-text" if self.fig.data else "text-slide-text"
@@ -147,6 +147,6 @@ def add_text_lines(content: str):
         text(line)
 
 
-def json_script(data: str, element_id: str) -> html_tag:
+def json_script(data: str, element_class: str) -> html_tag:
     # "</" would terminate the script element early, "<\/" is an equivalent json escape
-    return tags.script(raw(data.replace("</", "<\\/")), type="application/json", id=element_id)
+    return tags.script(raw(data.replace("</", "<\\/")), type="application/json", cls=element_class)
