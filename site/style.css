@@ -1,0 +1,122 @@
+body {
+    font-size: 24px;
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+}
+
+.title-slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    text-align: center;
+}
+
+.slide {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-sizing: border-box;
+    height: 100vh;
+    width: 100%;
+    padding: 0 8px;
+}
+
+.slide-row {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.graph {
+    flex: 0 0 50%;
+    height: 100%;
+}
+
+.slide-row.no-text .graph {
+    flex-basis: 100%;
+}
+
+.slide-row.no-text .slide-text {
+    display: none;
+}
+
+.slide-text {
+    flex: 1;
+    padding: 1px;
+    overflow: auto;
+}
+
+.text-slide-text {
+    font-size: 26px;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+
+.figure-slide-text {
+    font-size: 28px;
+}
+
+h1 {
+    font-size: 60px;
+}
+
+h2 {
+    font-size: 40px;
+    padding: 0;
+    margin: 0;
+}
+
+.slide-title {
+    margin: 16px 0 8px 0;
+    text-align: center;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+.responceunnorm table tr:nth-child(1) td:nth-child(3),
+.responceunnorm table tr:nth-child(1) td:nth-child(4),
+.responceunnorm table tr:nth-child(1) td:nth-child(7) {
+    background-color: #1F77B440;
+}
+
+.responceunnorm table tr:nth-child(2) td:nth-child(2),
+.responceunnorm table tr:nth-child(2) td:nth-child(4),
+.responceunnorm table tr:nth-child(2) td:nth-child(6) {
+    background-color: #D6272840;
+}
+
+.responceunnorm table tr:nth-child(3) td:nth-child(2),
+.responceunnorm table tr:nth-child(3) td:nth-child(3),
+.responceunnorm table tr:nth-child(3) td:nth-child(5) {
+    background-color: #2CA02C40;
+}
+
+.responcenorm table tr:nth-child(1) td:nth-child(3),
+.responcenorm table tr:nth-child(1) td:nth-child(4),
+.responcenorm table tr:nth-child(1) td:nth-child(7) {
+    background-color: #1F77B440;
+}
+
+.responcenorm table tr:nth-child(2) td:nth-child(2),
+.responcenorm table tr:nth-child(2) td:nth-child(4),
+.responcenorm table tr:nth-child(2) td:nth-child(6),
+.responcenorm table tr:nth-child(2) td:nth-child(7) {
+    background-color: #D6272840;
+}
+
+.responcenorm table tr:nth-child(3) td:nth-child(2),
+.responcenorm table tr:nth-child(3) td:nth-child(3),
+.responcenorm table tr:nth-child(3) td:nth-child(5),
+.responcenorm table tr:nth-child(3) td:nth-child(7) {
+    background-color: #2CA02C40;
+}
