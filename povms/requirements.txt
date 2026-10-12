@@ -1,6 +1,6 @@
 numpy~=2.4.4
 scipy~=1.17.1
-dash~=4.0.0
-dash-extensions~=2.0.4
+dominate~=2.9.1
+markdown~=3.11
 plotly~=6.0.1
 lark~=1.2.2

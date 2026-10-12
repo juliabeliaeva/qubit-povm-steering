@@ -1,12 +1,13 @@
-import itertools
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Dict, Set, Iterable, List, Tuple, Optional
+from typing import Dict, Set, Iterable, List, Optional
 
 import plotly.graph_objects as go
-from dash import dcc, html
-from dash.development.base_component import Component
+from dominate import tags
+from dominate.dom_tag import dom_tag as html_tag
+from dominate.util import raw, text
 from plotly.basedatatypes import BaseTraceType
+from util.utils import render_markdown
 
 
 class AbstractSlideBuilder(ABC):
@@ -16,8 +17,11 @@ class AbstractSlideBuilder(ABC):
         ...
 
     @abstractmethod
-    def build_components(self, slide: int, step: int) -> List[Component]:
+    def build_html(self) -> html_tag:
         ...
+
+    def build_steps(self) -> List[Dict[str, List[int]]]:
+        return [{"traces": [], "lines": []} for _ in range(self.n_steps)]
 
 
 class SlideBuilder(AbstractSlideBuilder):
@@ -90,58 +94,27 @@ class SlideBuilder(AbstractSlideBuilder):
         for trace_idx in trace_indices:
             self.visible_traces[self.current_step].add(trace_idx)
 
-    def build(self, step: int) -> Tuple[Optional[go.Figure], str, str]:
-        visible_traces = self.visible_traces[step]
-        for i, trace in enumerate(self.fig.data):
-            trace.visible = i in visible_traces
+    def build_steps(self) -> List[Dict[str, List[int]]]:
+        return [{"traces": sorted(self.visible_traces[step]), "lines": sorted(self.visible_lines[step])}
+                for step in range(self.n_steps)]
 
-        visible_lines = self.visible_lines[step]
-        text = "\n\n".join([line for i, line in enumerate(self.lines) if i in visible_lines])
+    def build_html(self) -> html_tag:
+        with tags.div(cls="slide") as slide:
+            if self.title:
+                tags.div(raw(render_markdown(f"## {self.title}")), cls="slide-title")
 
-        classes = [self.line_classes[line_id] for line_id in visible_lines if line_id in self.line_classes]
-        class_name = " ".join(classes)
+            with tags.div(cls="slide-row"):
+                if self.fig.data:
+                    tags.div(id="graph", cls="graph")
+                    json_script(self.fig.to_json(), "figure-data")
 
-        if not self.fig.data:
-            return None, text, class_name
+                text_class = "figure-slide-text" if self.fig.data else "text-slide-text"
+                with tags.div(cls=f"slide-text {text_class}"):
+                    for line_id, line in enumerate(self.lines):
+                        line_class = " ".join(["md-line", self.line_classes.get(line_id, "")]).strip()
+                        tags.div(raw(render_markdown(line)), cls=line_class, hidden=True)
 
-        return self.fig, text, class_name
-
-    def build_components(self, slide: int, step: int) -> List[Component]:
-        title = dcc.Markdown(f"## {self.title}", mathjax=True, className="slide-title",
-                             style={"textAlign": "center", "width": "100%"}) if self.title else None
-        figure, text, md_class_name = self.build(step)
-
-        content = []
-        if figure:
-            style = {"width": "100%"} if not text else None
-            graph = dcc.Graph(figure=figure, mathjax=True,
-                              config=dcc.Graph.Config(scrollZoom=True,
-                                                      toImageButtonOptions=dcc.Graph.ConfigToImageButtonOptions(
-                                                          width=None, height=None,  # noqa (use current dims)
-                                                          scale=2
-                                                      )),
-                              style=style)
-            if text:
-                content.append(graph)
-            else:
-                content.append(html.Div(graph, style={"display": "flex", "justifyContent": "center", "width": "100%"}))
-
-        if text:
-            text_style = {"flex": "1", "padding": "1px", "overflow": "auto"}
-            if not figure:
-                text_style = {**text_style, "paddingLeft": "100px", "paddingRight": "100px"}
-                class_name = "text-slide-text"
-            else:
-                class_name = "figure-slide-text"
-            content.append(html.Div(children=(dcc.Markdown(text, mathjax=True, dangerously_allow_html=True,
-                                                           className=f"md-{slide}-{step} {md_class_name}")),
-                                    className=class_name, style=text_style))
-
-        row = html.Div(content, style={"display": "flex", "flexDirection": "row", "flex": "1", "width": "100%"})
-        layout = [title, row] if title else [row]
-
-        return [html.Div(layout, style={"display": "flex", "flexDirection": "column", "height": "100%",
-                                        "width": "100%", "alignItems": "flex-start"})]
+        return slide
 
 
 class TitleSlideBuilder(AbstractSlideBuilder):
@@ -154,23 +127,26 @@ class TitleSlideBuilder(AbstractSlideBuilder):
     def n_steps(self):
         return 1
 
-    def build_components(self, slide: int, step: int) -> List[Component]:
-        style = {'textAlign': "center", 'fontFamily': "'Lato', sans-serif"}
+    def build_html(self) -> html_tag:
+        heading_constructor = [tags.h1, tags.h2, tags.h3, tags.h4, tags.h5, tags.h6][self.level - 1]
 
-        heading_constructor = [html.H1, html.H2, html.H3, html.H4, html.H5, html.H6][self.level - 1]
-        heading = heading_constructor(split_into_elements(self.title), style=style)
+        with tags.div(cls="title-slide") as slide:
+            with heading_constructor():
+                add_text_lines(self.title)
+            if self.subtitle is not None:
+                with tags.h5():
+                    add_text_lines(self.subtitle)
 
-        children = [heading]
-        if self.subtitle is not None:
-            children.append(html.H5(split_into_elements(self.subtitle), style=style))
-
-        return [html.Div(children=children,
-                         style={"display": "flex", "flexDirection": "column",
-                                "justifyContent": "center", "alignItems": "center",
-                                "height": "100vh", "width": "100vw"})]
+        return slide
 
 
-def split_into_elements(text: str) -> List:
-    split_text = text.split("\n")
-    text_elements = [[t, html.Br()] if i != len(split_text) - 1 else [t] for i, t in enumerate(split_text)]
-    return list(itertools.chain(*text_elements))
+def add_text_lines(content: str):
+    for i, line in enumerate(content.split("\n")):
+        if i > 0:
+            tags.br()
+        text(line)
+
+
+def json_script(data: str, element_id: str) -> html_tag:
+    # "</" would terminate the script element early, "<\/" is an equivalent json escape
+    return tags.script(raw(data.replace("</", "<\\/")), type="application/json", id=element_id)

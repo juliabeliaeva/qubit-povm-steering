@@ -1,6 +1,8 @@
+import html
 import re
-from typing import Dict
+from typing import Dict, List
 
+import markdown
 import numpy as np
 
 
@@ -27,3 +29,22 @@ def read_md(path: str) -> Dict[str, str]:
             label = str(i)
         result[label] = content[text_start:text_end].strip()
     return result
+
+
+math_pattern = re.compile(r'\$\$(.+?)\$\$|(?<!\\)\$(.+?)(?<!\\)\$', re.DOTALL)
+math_placeholder_pattern = re.compile(r'MATHPLACEHOLDER(\d+)END')
+
+
+def render_markdown(text: str) -> str:
+    # formulas are replaced with placeholders, so that markdown does not mangle underscores and backslashes,
+    # and then restored with MathJax delimiters
+    formulas: List[str] = []
+
+    def protect(match: re.Match) -> str:
+        display, inline = match.groups()
+        formula = rf'\[{display}\]' if display is not None else rf'\({inline}\)'
+        formulas.append(html.escape(formula, quote=False))
+        return f'MATHPLACEHOLDER{len(formulas) - 1}END'
+
+    rendered = markdown.markdown(math_pattern.sub(protect, text), extensions=['tables'])
+    return math_placeholder_pattern.sub(lambda m: formulas[int(m.group(1))], rendered)
