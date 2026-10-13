@@ -24,7 +24,7 @@ MATHJAX_URL = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
 # formulas are typeset by slides.js when they become visible,
 # glyphs are cached per formula since plotly removes the formulas it rendered when it redraws a figure
 MATHJAX_CONFIG = "window.MathJax = {startup: {typeset: false}, svg: {fontCache: 'local'}};"
-FONT_URLS = ["https://fonts.googleapis.com/css2?family=Lato&display=swap",
+FONT_URLS = ["https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap",
              "https://fonts.googleapis.com/css2?family=STIX+Two+Math&display=swap"]
 
 
