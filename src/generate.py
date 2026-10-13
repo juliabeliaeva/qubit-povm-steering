@@ -38,7 +38,7 @@ def build_slides(title: str) -> tuple[List[AbstractSlideBuilder], List[AbstractS
                                                                  subtitle="Based on\n"
                                                                           "\"Exact Steering Bound for Two-Qubit Werner States\"\n"
                                                                           "by Yujie Zhang and Eric Chitambar\n\n"
-                                                                          "Visualizations by Julia Beliaeva\n\n\n(Navigate using Left/Right Keys)"),
+                                                                          "Visualizations by Julia Beliaeva"),
                                                TitleSlideBuilder("Projectors", level=2),
                                                plot_pvm(pvm),
                                                TitleSlideBuilder("3-Outcome Measurements", level=2),
