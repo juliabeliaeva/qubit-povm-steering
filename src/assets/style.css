@@ -103,6 +103,10 @@ table, th, td {
     padding: 5px;
 }
 
+.reveal .progress {
+    background-color: black
+}
+
 .responceunnorm table tr:nth-child(1) td:nth-child(3),
 .responceunnorm table tr:nth-child(1) td:nth-child(4),
 .responceunnorm table tr:nth-child(1) td:nth-child(7) {
