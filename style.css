@@ -4,6 +4,19 @@ body {
     margin: 0;
 }
 
+.reveal .slides {
+    text-align: left;
+}
+
+.reveal .slides > section {
+    height: 100%;
+}
+
+/* step markers for reveal.js, the content of the steps is shown by slides.js */
+.reveal .fragment.step {
+    display: none;
+}
+
 .title-slide {
     display: flex;
     flex-direction: column;
@@ -58,17 +71,24 @@ body {
 }
 
 .figure-slide-text {
-    font-size: 28px;
+    font-size: 26px;
 }
 
 h1 {
-    font-size: 60px;
+    font-size: 70px;
+    font-weight: 900;
 }
 
 h2 {
     font-size: 40px;
+    font-weight: 700;
     padding: 0;
     margin: 0;
+}
+
+h5 {
+    font-size: 30px;
+    font-weight: 400;
 }
 
 .slide-title {
@@ -81,6 +101,10 @@ table, th, td {
     border: 1px solid lightgray;
     border-collapse: collapse;
     padding: 5px;
+}
+
+.reveal .progress {
+    background-color: black
 }
 
 .responceunnorm table tr:nth-child(1) td:nth-child(3),

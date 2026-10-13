@@ -1,15 +1,6 @@
 (function () {
     'use strict';
 
-    const slideData = JSON.parse(document.getElementById('slide-data').textContent);
-    const steps = slideData.steps;
-
-    const figureElement = document.getElementById('figure-data');
-    const figure = figureElement ? JSON.parse(figureElement.textContent) : null;
-    const graph = document.getElementById('graph');
-    const row = document.querySelector('.slide-row');
-    const lines = Array.from(document.querySelectorAll('.md-line'));
-
     const plotConfig = {
         scrollZoom: true,
         responsive: true,
@@ -17,16 +8,21 @@
     };
 
     const typesetElements = new Set();
-    let currentStep = parseStep(window.location.hash);
-    let plotted = false;
+    const slides = new Map();
 
-    function parseStep(hash) {
-        const value = hash.replace('#', '');
-        if (value === 'last') {
-            return steps.length - 1;
+    function getSlide(section) {
+        if (!slides.has(section)) {
+            const figureElement = section.querySelector('.figure-data');
+            slides.set(section, {
+                steps: JSON.parse(section.querySelector('.slide-steps').textContent),
+                figure: figureElement ? JSON.parse(figureElement.textContent) : null,
+                graph: section.querySelector('.graph'),
+                row: section.querySelector('.slide-row'),
+                lines: Array.from(section.querySelectorAll('.md-line')),
+                plotted: false
+            });
         }
-        const step = parseInt(value, 10);
-        return Number.isNaN(step) ? 0 : Math.min(Math.max(step, 0), steps.length - 1);
+        return slides.get(section);
     }
 
     function typesetMath(elements) {
@@ -35,90 +31,69 @@
         return pending.length > 0 ? MathJax.typesetPromise(pending) : Promise.resolve();
     }
 
-    function showStep() {
-        const step = steps[currentStep];
+    function getCurrentStep() {
+        // step i is shown together with the fragment i - 1, the fragment index is undefined for one-step slides
+        const fragment = Reveal.getIndices().f;
+        return fragment === undefined ? 0 : fragment + 1;
+    }
+
+    function showStep(section, stepIdx) {
+        const slide = getSlide(section);
+        const step = slide.steps[Math.min(stepIdx, slide.steps.length - 1)];
 
         const visibleLines = new Set(step.lines);
-        lines.forEach((line, i) => {
+        slide.lines.forEach((line, i) => {
             line.hidden = !visibleLines.has(i);
         });
-        typesetMath(lines.filter((_, i) => visibleLines.has(i)));
-        if (row) {
-            row.classList.toggle('no-text', visibleLines.size === 0);
+        typesetMath(slide.lines.filter((_, i) => visibleLines.has(i)));
+        if (slide.row) {
+            slide.row.classList.toggle('no-text', visibleLines.size === 0);
         }
 
-        if (figure) {
+        if (slide.figure) {
             const visibleTraces = new Set(step.traces);
-            const visible = figure.data.map((_, i) => visibleTraces.has(i));
-            if (!plotted) {
-                figure.data.forEach((trace, i) => {
+            const visible = slide.figure.data.map((_, i) => visibleTraces.has(i));
+            // figures are plotted when their slide is first shown, since plotly can't size a hidden element
+            if (!slide.plotted) {
+                slide.figure.data.forEach((trace, i) => {
                     trace.visible = visible[i];
                 });
-                Plotly.newPlot(graph, figure.data, figure.layout, plotConfig);
-                plotted = true;
+                Plotly.newPlot(slide.graph, slide.figure.data, slide.figure.layout, plotConfig);
+                slide.plotted = true;
             } else {
-                Plotly.restyle(graph, {visible: visible});
-                Plotly.Plots.resize(graph);
+                Plotly.restyle(slide.graph, {visible: visible});
+                Plotly.Plots.resize(slide.graph);
             }
         }
-
-        history.replaceState(null, '', '#' + currentStep);
     }
 
-    function goToPage(page, step) {
-        if (page) {
-            window.location.href = page + '#' + step;
-        }
+    function showCurrentStep() {
+        showStep(Reveal.getCurrentSlide(), getCurrentStep());
     }
 
-    function nextStep() {
-        if (currentStep < steps.length - 1) {
-            currentStep++;
-            showStep();
-        } else {
-            goToPage(slideData.next, 0);
-        }
+    function goToEnd() {
+        Reveal.slide(Reveal.getIndices(document.getElementById('end')).h);
     }
 
-    function previousStep() {
-        if (currentStep > 0) {
-            currentStep--;
-            showStep();
-        } else {
-            goToPage(slideData.previous, 'last');
-        }
-    }
-
-    document.addEventListener('keydown', event => {
-        switch (event.key) {
-            case 'ArrowRight':
-            case ' ':
-                nextStep();
-                break;
-            case 'ArrowLeft':
-                previousStep();
-                break;
-            case 'Home':
-                goToPage(slideData.home, 0);
-                break;
-            case 'End':
-                goToPage(slideData.end, 'last');
-                break;
-            default:
-                return;
-        }
-        event.preventDefault();
-    });
-
-    // navigating to the same page with a different step only changes the hash
-    window.addEventListener('hashchange', () => {
-        currentStep = parseStep(window.location.hash);
-        showStep();
-    });
-
-    // plotly needs MathJax to render formulas in the figures
-    MathJax.startup.promise.then(() => {
-        typesetMath(Array.from(document.querySelectorAll('.slide-title')));
-        showStep();
-    });
+    Reveal.initialize({
+        hash: true,
+        // slides fill the window without scaling, since plotly doesn't handle mouse events in scaled elements
+        width: '100%',
+        height: '100%',
+        margin: 0,
+        minScale: 1,
+        maxScale: 1,
+        center: false,
+        transition: 'none',
+        keyboard: {35: goToEnd}  // End
+    })
+        // plotly needs MathJax to render formulas in the figures
+        .then(() => MathJax.startup.promise)
+        .then(() => {
+            typesetMath(Array.from(document.querySelectorAll('.slide-title')));
+            showCurrentStep();
+            ['slidechanged', 'fragmentshown', 'fragmenthidden', 'resize'].forEach(event => {
+                Reveal.on(event, showCurrentStep);
+            });
+        });
 })();
